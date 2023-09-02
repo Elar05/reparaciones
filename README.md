@@ -1,0 +1,1 @@
+Sistema para la administración de reparaciones de equipos tecnológicos, desarrollado con PHP - MySQL - jQuery - MVC - POO
