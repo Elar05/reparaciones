@@ -42,4 +42,28 @@ class UsuarioTiposModel extends Model
       return false;
     }
   }
+
+  public function update($id, $tipo)
+  {
+    try {
+      $query = $this->prepare("UPDATE usuario_tipos SET tipo = :tipo WHERE id = :id;");
+      $query->bindParam(':tipo', $tipo, PDO::PARAM_STR);
+      $query->bindParam(':id', $id, PDO::PARAM_INT);
+      return $query->execute();
+    } catch (PDOException $e) {
+      error_log('UsuarioTiposModel::update() -> ' . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function delete($id)
+  {
+    try {
+      $query = $this->prepare("DELETE FROM usuario_tipos WHERE id = ?;");
+      return $query->execute([$id]);
+    } catch (PDOException $e) {
+      error_log('UsuarioTiposModel::delete() -> ' . $e->getMessage());
+      return false;
+    }
+  }
 }

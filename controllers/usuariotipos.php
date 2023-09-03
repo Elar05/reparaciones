@@ -48,4 +48,65 @@ class UsuarioTipos extends Controller
       ]);
     }
   }
+
+  public function edit($params)
+  {
+    if (!isset($params)) {
+      $this->redirect('usuariotipos', [
+        "error" => Errors::ERROR_USUARIOTIPOS_UPDATE_EMPTY
+      ]);
+    }
+
+    $id = $params[0];
+
+    $tipo = $this->model->get($id);
+
+    if (empty($tipo)) {
+      $this->redirect('usuariotipos', [
+        "error" => Errors::ERROR_USUARIOTIPOS_UPDATE_EXISTS
+      ]);
+    }
+
+    $this->view->render('usuariotipos/edit', ["tipo" => $tipo]);
+  }
+
+  public function update()
+  {
+    if (empty($_POST['id']) || empty($_POST['tipo'])) {
+      $this->redirect('usuariotipos', [
+        "error" => Errors::ERROR_USUARIOTIPOS_UPDATE_EMPTY
+      ]);
+      return;
+    }
+
+    if ($this->model->update($_POST['id'], $_POST['tipo'])) {
+      $this->redirect('usuariotipos', [
+        "success" => Success::SUCCESS_USUARIOTIPOS_UPDATE
+      ]);
+    } else {
+      $this->redirect('usuariotipos', [
+        "error" => Errors::ERROR_USUARIOTIPOS_UPDATE
+      ]);
+    }
+  }
+
+  public function delete()
+  {
+    if (empty($_GET['id'])) {
+      $this->redirect('usuariotipos', [
+        "error" => Errors::ERROR_USUARIOTIPOS_DELETE_EMPTY
+      ]);
+      return;
+    }
+
+    if ($this->model->delete($_GET['id'])) {
+      $this->redirect('usuariotipos', [
+        "success" => Success::SUCCESS_USUARIOTIPOS_DELETE
+      ]);
+    } else {
+      $this->redirect('usuariotipos', [
+        "error" => Errors::ERROR_USUARIOTIPOS_DELETE
+      ]);
+    }
+  }
 }

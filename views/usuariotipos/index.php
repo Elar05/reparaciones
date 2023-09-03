@@ -15,6 +15,8 @@
               <i class="fa fa-plus"></i> Agregar Nuevo</a>
           </div>
           <div class="card-body">
+            <div class="mb-2"><?php $this->showMessages() ?></div>
+
             <div class="table-responsive">
               <table class="table table-striped w-100">
                 <thead>
@@ -33,9 +35,9 @@
                         <a href="<?= URL ?>usuariotipos/edit/<?= $tipo['id'] ?>" class="ml-1 btn btn-warning">
                           <i class="fas fa-pencil-alt"></i>
                         </a>
-                        <button class="btn btn-danger deleted" id="<?= $tipo['id'] ?>">
+                        <a href="<?= URL ?>usuariotipos/delete?id=<?= $tipo['id'] ?>" class="btn btn-danger">
                           <i class="fas fa-times"></i>
-                        </button>
+                        </a>
                       </td>
                     </tr>
                   <?php endforeach; ?>
