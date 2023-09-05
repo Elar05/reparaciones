@@ -10,7 +10,7 @@ class UsuarioModel extends Model
   public function getAll()
   {
     try {
-      $query = $this->query("SELECT * FROM usuarios");
+      $query = $this->query("SELECT u.*, ut.tipo FROM usuarios u JOIN usuario_tipos ut ON u.idtipo_usuario = ut.id;");
       $query->execute();
       return $query->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {

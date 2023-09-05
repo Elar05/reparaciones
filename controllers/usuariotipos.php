@@ -26,6 +26,7 @@ class UsuarioTipos extends Controller
       $this->redirect('usuariotipos/create', [
         "error" => Errors::ERROR_USUARIOTIPOS_SAVE_EMPTY
       ]);
+      return;
     }
 
     $tipo = trim($_POST['tipo']);
@@ -33,8 +34,9 @@ class UsuarioTipos extends Controller
     // Validar que existencia
     if ($this->model->get($tipo, "tipo")) {
       $this->redirect('usuariotipos/create', [
-        "error" => Errors::ERROR_USUARIOTIPOS_SAVE_EMPTY
+        "error" => Errors::ERROR_USUARIOTIPOS_SAVE_EXISTS
       ]);
+      return;
     }
 
     // Guardar

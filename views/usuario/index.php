@@ -84,9 +84,9 @@
               <label for="tipo">Tipo</label>
               <select id="tipo" name="tipo" class="form-control" required>
                 <option value="" selected disabled>__ Seleccione __</option>
-                <option value="1">Admin</option>
-                <option value="2">Secretaria</option>
-                <option value="3">Técnico</option>
+                <?php foreach ($this->d['tipos'] as $tipo) : ?>
+                  <option value="<?= $tipo['id'] ?>"><?= $tipo['tipo'] ?></option>
+                <?php endforeach; ?>
               </select>
               <div class="invalid-feedback">
                 Oh no! Tipo is invalid.

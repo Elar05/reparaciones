@@ -12,7 +12,9 @@ class Usuario extends Controller
 
   public function render()
   {
-    $this->view->render('usuario/index');
+    $this->view->render('usuario/index', [
+      "tipos" => $this->getTipos()
+    ]);
   }
 
   public function list()
@@ -21,6 +23,8 @@ class Usuario extends Controller
     $usuarios = $this->model->getAll();
     if (count($usuarios) > 0) {
       foreach ($usuarios as $usuario) {
+        if ($usuario['idtipo_usuario'] === 1) continue;
+
         $botones = "<button class='btn btn-warning edit' id='{$usuario["id"]}'><i class='fas fa-pencil-alt'></i></button>";
         $botones .= "<button class='btn btn-danger delete' id='{$usuario["id"]}'><i class='fas fa-times'></i></button>";
 
@@ -39,7 +43,7 @@ class Usuario extends Controller
           $usuario["email"],
           $usuario["telefono"],
           $usuario["direccion"],
-          $usuario["idtipo_usuario"],
+          $usuario["tipo"],
           $estado,
           $botones
         ];
@@ -60,7 +64,7 @@ class Usuario extends Controller
       "tipo" => $_POST['tipo'],
       "nombres" => $_POST['nombres'],
       "email" => $_POST['email'],
-      "password" => $_POST['password'],
+      "password" => password_hash($_POST['password'], PASSWORD_DEFAULT, ["cost" => 10]),
       "telefono" => $_POST['telefono'],
       "direccion" => $_POST['direccion'],
     ])) {
@@ -102,8 +106,10 @@ class Usuario extends Controller
       "direccion" => $_POST['direccion'],
     ], $_POST['id'])) {
       if (!empty($_POST["password"]))
-        $this->model->update(["password" => $_POST["password"]], $_POST["id"]);
-
+        $this->model->update(
+          ["password" => password_hash($_POST['password'], PASSWORD_DEFAULT, ["cost" => 10])],
+          $_POST["id"]
+        );
       echo json_encode(["success" => "Usuario actualizado"]);
     } else {
       echo json_encode(["error" => "Error al actualizar usuario"]);
@@ -138,5 +144,12 @@ class Usuario extends Controller
     } else {
       echo json_encode(["error" => "No se puedo actualizar estado"]);
     }
+  }
+
+  public function getTipos()
+  {
+    require_once 'models/usuarioTiposModel.php';
+    $tipos = new UsuarioTiposModel();
+    return $tipos->getAll();
   }
 }
