@@ -7,18 +7,18 @@
     <ul class="sidebar-menu">
       <li class="menu-header">Menu</li>
       <li class="dropdown">
-        <a href="<?= URL ?>" class="nav-link">
-        <i data-feather="users"></i><span>Users</span>
-      </a>
-      </li>
-      <li class="dropdown">
         <a href="#" class="menu-toggle nav-link has-dropdown">
-        <i data-feather="users"></i><span>Users</span>
+          <i data-feather="users"></i><span>Usuarios</span>
         </a>
         <ul class="dropdown-menu">
           <li><a class="nav-link" href="<?= URL ?>usuario">Listado</a></li>
           <li><a class="nav-link" href="<?= URL ?>usuariotipos">Tipos</a></li>
         </ul>
+      </li>
+      <li class="dropdown">
+        <a href="<?= URL ?>cliente" class="nav-link">
+          <i data-feather="users"></i><span>Clientes</span>
+        </a>
       </li>
     </ul>
   </aside>
