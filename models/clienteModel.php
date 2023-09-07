@@ -7,7 +7,18 @@ class ClienteModel extends Model
     parent::__construct();
   }
 
-  
+  public function get($value, $column = "id")
+  {
+    try {
+      $query = $this->prepare("SELECT * FROM clientes WHERE $column = ?;");
+      $query->execute([$value]);
+      return $query->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log('ClienteModel::get() -> ' . $e->getMessage());
+      return false;
+    }
+  }
+
   public function getAll()
   {
     try {
@@ -16,6 +27,23 @@ class ClienteModel extends Model
       return $query->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
       error_log('ClienteModel::getAll() -> ' . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function save($data)
+  {
+    try {
+      $query = $this->prepare("INSERT INTO clientes (documento, nombres, email, telefono) VALUES (:documento, :nombres, :email, :telefono)");
+
+      $query->bindParam(':documento', $data['documento'], PDO::PARAM_STR);
+      $query->bindParam(':nombres', $data['nombres'], PDO::PARAM_STR);
+      $query->bindParam(':email', $data['email'], PDO::PARAM_STR);
+      $query->bindParam(':telefono', $data['telefono'], PDO::PARAM_STR);
+
+      return $query->execute();
+    } catch (PDOException $e) {
+      error_log('ClienteModel::save() -> ' . $e->getMessage());
       return false;
     }
   }

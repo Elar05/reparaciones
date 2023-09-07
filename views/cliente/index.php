@@ -23,7 +23,7 @@
               <table class="table table-striped w-100" id="table_cliente">
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    <th>ID</th>a
                     <th>Documento</th>
                     <th>Nombres</th>
                     <th>Email</th>
@@ -57,9 +57,14 @@
 
             <div class="col-12 form-group">
               <label for="documento">Documento</label>
-              <input type="text" id="documento" name="documento" class="form-control" pattern="[0-9]+" required>
-              <div class="invalid-feedback">
-                Oh no! Documento is invalid.
+              <div class="input-group">
+                <input type="text" id="documento" name="documento" class="form-control" maxlength="8" pattern="[0-9]+" required>
+                <div class="input-group-append">
+                  <button class="btn btn-primary" id="search_cliente"><i class="fa fa-search"></i> Buscar</button>
+                </div>
+                <div class="invalid-feedback">
+                  Oh no! Documento is invalid.
+                </div>
               </div>
             </div>
 

@@ -36,5 +36,12 @@ class Controller
     }
 
     header('Location: ' . URL . $url . $params);
+    exit();
+  }
+
+  public function response($data)
+  {
+    echo json_encode($data);
+    exit();
   }
 }

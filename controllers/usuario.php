@@ -50,14 +50,13 @@ class Usuario extends Controller
       }
     }
 
-    echo json_encode(["data" => $data]);
+    $this->response(["data" => $data]);
   }
 
   public function create()
   {
     if (empty($_POST['tipo']) || empty($_POST['nombres']) || empty($_POST['email']) || empty($_POST['password']) || empty($_POST['telefono']) || empty($_POST['direccion'])) {
-      echo json_encode(["error" => "Faltan parametros"]);
-      return;
+      $this->response(["error" => "Faltan parametros"]);
     }
 
     if ($this->model->save([
@@ -68,34 +67,32 @@ class Usuario extends Controller
       "telefono" => $_POST['telefono'],
       "direccion" => $_POST['direccion'],
     ])) {
-      echo json_encode(["success" => "Usuario creado"]);
+      $this->response(["success" => "Usuario creado"]);
     } else {
-      echo json_encode(["error" => "Error al crear usuario"]);
+      $this->response(["error" => "Error al crear usuario"]);
     }
   }
 
   public function get()
   {
     if (empty($_POST['id'])) {
-      echo json_encode(["error" => "Faltan parametros"]);
-      return;
+      $this->response(["error" => "Faltan parametros"]);
     }
 
     $usuario = $this->model->get($_POST["id"]);
     if ($usuario) {
       unset($usuario["password"]);
 
-      echo json_encode(["usuario" => $usuario]);
+      $this->response(["usuario" => $usuario]);
     } else {
-      echo json_encode(["error" => "Usuario no encontrado"]);
+      $this->response(["error" => "Usuario no encontrado"]);
     }
   }
 
   public function edit()
   {
     if (empty($_POST['id']) || empty($_POST['tipo']) || empty($_POST['nombres']) || empty($_POST['email']) || empty($_POST['telefono']) || empty($_POST['direccion'])) {
-      echo json_encode(["error" => "Faltan parametros"]);
-      return;
+      $this->response(["error" => "Faltan parametros"]);
     }
 
     if ($this->model->update([
@@ -110,39 +107,37 @@ class Usuario extends Controller
           ["password" => password_hash($_POST['password'], PASSWORD_DEFAULT, ["cost" => 10])],
           $_POST["id"]
         );
-      echo json_encode(["success" => "Usuario actualizado"]);
+      $this->response(["success" => "Usuario actualizado"]);
     } else {
-      echo json_encode(["error" => "Error al actualizar usuario"]);
+      $this->response(["error" => "Error al actualizar usuario"]);
     }
   }
 
   public function delete()
   {
     if (empty($_POST['id'])) {
-      echo json_encode(["error" => "Faltan parametros"]);
-      return;
+      $this->response(["error" => "Faltan parametros"]);
     }
 
     if ($this->model->delete($_POST["id"])) {
-      echo json_encode(["success" => "Usuario eliminado"]);
+      $this->response(["success" => "Usuario eliminado"]);
     } else {
-      echo json_encode(["error" => "No se puedo eliminar usuario"]);
+      $this->response(["error" => "No se puedo eliminar usuario"]);
     }
   }
 
   public function updateStatus()
   {
     if (empty($_POST['id']) || !isset($_POST['estado'])) {
-      echo json_encode(["error" => "Faltan parametros"]);
-      return;
+      $this->response(["error" => "Faltan parametros"]);
     }
 
     $estado = ($_POST['estado'] == 1) ? 0 : 1;
 
     if ($this->model->update(["estado" => $estado], $_POST["id"])) {
-      echo json_encode(["success" => "Estado actualizado"]);
+      $this->response(["success" => "Estado actualizado"]);
     } else {
-      echo json_encode(["error" => "No se puedo actualizar estado"]);
+      $this->response(["error" => "No se puedo actualizar estado"]);
     }
   }
 

@@ -44,4 +44,41 @@ class Cliente extends Controller
 
     echo json_encode(["data" => $data]);
   }
+
+  public function create()
+  {
+    if (empty($_POST['documento']) || empty($_POST['nombres']) || empty($_POST['email']) || empty($_POST['telefono'])) {
+      $this->response(["error" => "Faltan parametros"]);
+    }
+
+    // Validar que existencia
+    if ($this->model->get($_POST['documento'], "documento")) {
+      $this->response(["error" => "Documento ya registrado"]);
+    }
+
+    if ($this->model->save([
+      "documento" => $_POST['documento'],
+      "nombres" => $_POST['nombres'],
+      "email" => $_POST['email'],
+      "telefono" => $_POST['telefono'],
+    ])) {
+      $this->response(["success" => "Usuario creado"]);
+    } else {
+      $this->response(["error" => "Error al crear usuario"]);
+    }
+  }
+
+  public function get()
+  {
+    if (empty($_POST['value'])) {
+      $this->response(["error" => "El documento esta vacio"]);
+    }
+
+    $cliente = $this->model->get($_POST['value'], $_POST['column'] ?? "id");
+    if (!empty($cliente)) {
+      $this->response(["success" => "Cliente encontrado", "cliente" => $cliente]);
+    } else {
+      $this->response(["error" => "Cliente no encontrado"]);
+    }
+  }
 }
