@@ -47,4 +47,22 @@ class ClienteModel extends Model
       return false;
     }
   }
+
+  public function update($data, $id)
+  {
+    try {
+      $sql = "UPDATE clientes SET ";
+      foreach ($data as $column => $value) {
+        $sql .= "$column = '$value', ";
+      }
+      $sql = rtrim($sql, ', ');
+      $sql .= " WHERE id = $id;";
+
+      $query = $this->query($sql);
+      return $query->execute();
+    } catch (PDOException $e) {
+      error_log('ClienteModel::update() -> ' . $e->getMessage());
+      return false;
+    }
+  }
 }

@@ -62,9 +62,9 @@ class Cliente extends Controller
       "email" => $_POST['email'],
       "telefono" => $_POST['telefono'],
     ])) {
-      $this->response(["success" => "Usuario creado"]);
+      $this->response(["success" => "Cliente creado"]);
     } else {
-      $this->response(["error" => "Error al crear usuario"]);
+      $this->response(["error" => "Error al crear Cliente"]);
     }
   }
 
@@ -79,6 +79,24 @@ class Cliente extends Controller
       $this->response(["success" => "Cliente encontrado", "cliente" => $cliente]);
     } else {
       $this->response(["error" => "Cliente no encontrado"]);
+    }
+  }
+
+  public function edit()
+  {
+    if (empty($_POST['id']) || empty($_POST['documento']) || empty($_POST['nombres']) || empty($_POST['email']) || empty($_POST['telefono'])) {
+      $this->response(["error" => "Faltan parametros"]);
+    }
+
+    if ($this->model->update([
+      "documento" => $_POST['documento'],
+      "nombres" => $_POST['nombres'],
+      "email" => $_POST['email'],
+      "telefono" => $_POST['telefono'],
+    ], $_POST['id'])) {
+      $this->response(["success" => "Cliente Actualizado"]);
+    } else {
+      $this->response(["error" => "Error al actualizar Cliente"]);
     }
   }
 }

@@ -19,6 +19,7 @@ $("#add_cliente").click(function (e) {
   $("#action").val("create");
   $("#form_cliente")[0].reset();
   $("#form_cliente").removeClass("was-validated");
+  $("#id").val("");
 });
 
 // Register user => create / update
@@ -76,6 +77,35 @@ $("#search_cliente").click(function (e) {
           position: "topCenter",
           displayMode: 1,
         });
+      } else {
+        iziToast.error({
+          title: "Error, ",
+          message: data.error,
+          position: "topCenter",
+          displayMode: 1,
+        });
+      }
+    },
+    "json"
+  );
+});
+
+// Editar cliente
+$(document).on("click", "button.edit", function () {
+  $("#form_cliente")[0].reset();
+  $("#action").val("edit");
+  $("#modal_cliente").modal("toggle");
+  let id = $(this).attr("id");
+  $.post(
+    "cliente/get",
+    { value: id },
+    function (data, textStatus, jqXHR) {
+      if ("cliente" in data) {
+        $("#id").val(data.cliente.id);
+        $("#nombres").val(data.cliente.nombres);
+        $("#email").val(data.cliente.email);
+        $("#telefono").val(data.cliente.telefono);
+        $("#documento").val(data.cliente.documento);
       } else {
         iziToast.error({
           title: "Error, ",
