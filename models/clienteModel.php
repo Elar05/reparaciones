@@ -65,4 +65,15 @@ class ClienteModel extends Model
       return false;
     }
   }
+
+  public function delete($id)
+  {
+    try {
+      $query = $this->prepare("DELETE FROM clientes WHERE id = ?;");
+      return $query->execute([$id]);
+    } catch (PDOException $e) {
+      error_log('ClienteModel::delete() -> ' . $e->getMessage());
+      return false;
+    }
+  }
 }

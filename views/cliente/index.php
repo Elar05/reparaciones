@@ -23,7 +23,7 @@
               <table class="table table-striped w-100" id="table_cliente">
                 <thead>
                   <tr>
-                    <th>ID</th>a
+                    <th>ID</th>
                     <th>Documento</th>
                     <th>Nombres</th>
                     <th>Email</th>

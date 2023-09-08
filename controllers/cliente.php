@@ -99,4 +99,32 @@ class Cliente extends Controller
       $this->response(["error" => "Error al actualizar Cliente"]);
     }
   }
+
+  public function delete()
+  {
+    if (empty($_POST['id'])) {
+      $this->response(["error" => "Faltan parametros"]);
+    }
+
+    if ($this->model->delete($_POST["id"])) {
+      $this->response(["success" => "Cliente eliminado"]);
+    } else {
+      $this->response(["error" => "No se puedo eliminar Cliente"]);
+    }
+  }
+
+  public function updateStatus()
+  {
+    if (empty($_POST['id']) || !isset($_POST['estado'])) {
+      $this->response(["error" => "Faltan parametros"]);
+    }
+
+    $estado = ($_POST['estado'] == 1) ? 0 : 1;
+
+    if ($this->model->update(["estado" => $estado], $_POST["id"])) {
+      $this->response(["success" => "Estado actualizado"]);
+    } else {
+      $this->response(["error" => "No se puedo actualizar estado"]);
+    }
+  }
 }

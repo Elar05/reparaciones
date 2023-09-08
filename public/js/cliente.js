@@ -118,3 +118,75 @@ $(document).on("click", "button.edit", function () {
     "json"
   );
 });
+
+// Eliminar cliente
+$(document).on("click", "button.delete", function () {
+  let id = $(this).attr("id"),
+    row = $(this).parent().parent();
+
+  swal({
+    title: "¿Seguro de querer eliminar?",
+    text: "",
+    icon: "warning",
+    buttons: true,
+    dangerMode: true,
+  }).then((confirm) => {
+    if (confirm) {
+      $.post(
+        "cliente/delete",
+        { id },
+        function (data, textStatus, jqXHR) {
+          if ("success" in data) {
+            iziToast.success({
+              title: "Éxito, ",
+              message: data.success,
+              position: "topCenter",
+              displayMode: 1,
+            });
+
+            // Eliminar row del cliente
+            $("#table_cliente").DataTable().row(row).remove().draw();
+          } else {
+            iziToast.error({
+              title: "Error, ",
+              message: data.error,
+              position: "topCenter",
+              displayMode: 1,
+            });
+          }
+        },
+        "json"
+      );
+    }
+  });
+});
+
+// Cambiar estado cliente
+$(document).on("click", "button.estado", function () {
+  let id = $(this).attr("id"),
+    estado = $(this).attr("estado");
+
+  $.post(
+    "cliente/updateStatus",
+    { id, estado },
+    function (data, textStatus, jqXHR) {
+      if ("success" in data) {
+        iziToast.success({
+          title: "Éxito, ",
+          message: data.success,
+          position: "topCenter",
+          displayMode: 1,
+        });
+        loadTable();
+      } else {
+        iziToast.error({
+          title: "Error, ",
+          message: data.error,
+          position: "topCenter",
+          displayMode: 1,
+        });
+      }
+    },
+    "json"
+  );
+});
