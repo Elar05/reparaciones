@@ -19,4 +19,22 @@ class EquipoModel extends Model
       return false;
     }
   }
+
+  public function save($data)
+  {
+    try {
+      $pdo = $this->connect();
+      $query = $pdo->prepare("INSERT INTO equipos (idcliente, idtipo_equipo, modelo, n_serie, descripcion) VALUES (:idcliente, :idtipo_equipo, :modelo, :n_serie, :descripcion);");
+      $query->bindParam(':idcliente', $data['idcliente'], PDO::PARAM_STR);
+      $query->bindParam(':idtipo_equipo', $data['tipo'], PDO::PARAM_STR);
+      $query->bindParam(':modelo', $data['modelo'], PDO::PARAM_STR);
+      $query->bindParam(':n_serie', $data['n_serie'], PDO::PARAM_STR);
+      $query->bindParam(':descripcion', $data['descripcion'], PDO::PARAM_STR);
+      $query->execute();
+      return $pdo->lastInsertId();
+    } catch (PDOException $e) {
+      error_log('EquipoModel::save() -> ' . $e->getMessage());
+      return false;
+    }
+  }
 }
