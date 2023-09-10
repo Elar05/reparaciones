@@ -91,6 +91,8 @@ $("#form_equipo").submit(function (e) {
       "json"
     );
   }
+
+  form.addClass("was-validated");
 });
 
 // Buscar cliente
@@ -114,6 +116,47 @@ $("#search_cliente").click(function (e) {
         $("#nombres").val(data.cliente.nombres);
         $("#email").val(data.cliente.email);
         $("#telefono").val(data.cliente.telefono);
+      }
+    },
+    "json"
+  );
+});
+
+// Mostrar los datos del equipo en el modal
+$(document).on("click", "button.edit", function () {
+  $("#form_equipo")[0].reset();
+  $("#modal_equipo").modal("toggle");
+  $("#action").val("edit");
+  let id = $(this).attr("id");
+  $.post(
+    `equipo/get`,
+    { id },
+    function (data, textStatus, jqXHR) {
+      if ("equipo" in data) {
+        $("#id").val(data.equipo.id);
+
+        $("#documento").val(data.equipo.documento).attr("disabled", "disabled");
+        $("#nombres").val(data.equipo.nombres).attr("disabled", "disabled");
+        $("#email").val(data.equipo.email).attr("disabled", "disabled");
+        $("#telefono").val(data.equipo.telefono).attr("disabled", "disabled");
+
+        $("#tipo").val(data.equipo.idtipo_equipo);
+        $("#modelo").val(data.equipo.modelo);
+        $("#n_serie").val(data.equipo.n_serie);
+        $("#descripcion").val(data.equipo.descripcion);
+
+        $("#tab-cliente").removeClass("active");
+        $("#tab-equipo").removeClass("disabled").addClass("active");
+
+        $("#tab_equipo").addClass("active show");
+        $("#tab_cliente").removeClass("active show");
+      } else {
+        iziToast.error({
+          title: "Error, ",
+          message: data.error,
+          position: "topCenter",
+          displayMode: 1,
+        });
       }
     },
     "json"

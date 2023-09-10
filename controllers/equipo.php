@@ -26,7 +26,7 @@ class Equipo extends Controller
           $equipo["cliente"],
           $equipo["modelo"],
           $equipo["n_serie"],
-          $equipo["idtipo_equipo"],
+          $equipo["tipo"],
           $equipo["descripcion"],
           $botones
         ];
@@ -73,6 +73,38 @@ class Equipo extends Controller
       $this->response(["success" => "Equipo registrado"]);
     } else {
       $this->response(["error" => "Error al registrar equipo"]);
+    }
+  }
+
+  public function get()
+  {
+    if (empty($_POST['id'])) {
+      $this->response(["error" => "Faltan parametros"]);
+    }
+
+    $equipo = $this->model->get($_POST['id']);
+    if (!empty($equipo)) {
+      $this->response(["equipo" => $equipo]);
+    } else {
+      $this->response(["error" => "No se encontro el registro"]);
+    }
+  }
+
+  public function edit()
+  {
+    if (empty($_POST['id']) || empty($_POST['modelo']) || empty($_POST['n_serie']) || empty($_POST['descripcion']) || empty($_POST['tipo'])) {
+      $this->response(["error" => "Faltan parametros"]);
+    }
+
+    if ($this->model->update([
+      'modelo' => $_POST['modelo'],
+      'n_serie' => $_POST['n_serie'],
+      'descripcion' => $_POST['descripcion'],
+      'idtipo_equipo' => $_POST['tipo'],
+    ], $_POST['id'])) {
+      $this->response(["success" => "Equipo actualizado"]);
+    } else {
+      $this->response(["error" => "Error al actualizar equipo"]);
     }
   }
 

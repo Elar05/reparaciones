@@ -10,12 +10,24 @@ class EquipoModel extends Model
   public function getAll()
   {
     try {
-      // $query = $this->query("SELECT e.*, et.tipo FROM equipos e JOIN equipo_tipos et ON e.idtipo_equipo = et.id;");
-      $query = $this->query("SELECT e.*, c.nombres AS cliente FROM equipos e JOIN clientes c ON e.idcliente = c.id;");
+      $query = $this->query("SELECT e.*, et.tipo FROM equipos e JOIN equipo_tipos et ON e.idtipo_equipo = et.id;");
+      $query = $this->query("SELECT e.*, c.nombres AS cliente, et.tipo FROM equipos e JOIN clientes c ON e.idcliente = c.id JOIN equipo_tipos et ON e.idtipo_equipo = et.id;");
       $query->execute();
       return $query->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
       error_log('EquipoModel::getAll() -> ' . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function get($id, $column = "id")
+  {
+    try {
+      $query = $this->prepare("SELECT e.*, c.documento, c.nombres, c.email, c.telefono FROM equipos e JOIN clientes c ON e.idcliente = c.id WHERE e.$column = ?;");
+      $query->execute([$id]);
+      return $query->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log('EquipoModel::get() -> ' . $e->getMessage());
       return false;
     }
   }
@@ -34,6 +46,24 @@ class EquipoModel extends Model
       return $pdo->lastInsertId();
     } catch (PDOException $e) {
       error_log('EquipoModel::save() -> ' . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function update($datos, $id)
+  {
+    try {
+      $sql = "UPDATE equipos SET ";
+      foreach ($datos as $columna => $valor) {
+        $sql .= "$columna = '$valor', ";
+      }
+
+      $sql = rtrim($sql, ', '); // elimina la última coma y el espacio
+      $sql .= " WHERE id = $id;";
+      $query = $this->query($sql);
+      return $query->execute();
+    } catch (PDOException $e) {
+      error_log("EquipoModel::update() -> " . $e->getMessage());
       return false;
     }
   }
