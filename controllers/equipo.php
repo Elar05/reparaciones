@@ -9,7 +9,9 @@ class Equipo extends Controller
 
   public function render()
   {
-    $this->view->render('equipo/index');
+    $this->view->render('equipo/index', [
+      "tipos" => $this->getTipos()
+    ]);
   }
 
   public function list()
@@ -108,9 +110,29 @@ class Equipo extends Controller
     }
   }
 
+  public function delete()
+  {
+    if (empty($_POST['id'])) {
+      $this->response(["error" => "Faltan parametros"]);
+    }
+
+    if ($this->model->delete($_POST['id'])) {
+      $this->response(["success" => "equipo eliminado"]);
+    } else {
+      $this->response(["error" => "Error al eliminar equipo"]);
+    }
+  }
+
   public function clienteModel()
   {
     require_once 'models/clienteModel.php';
     return new ClienteModel();
+  }
+
+  public function getTipos()
+  {
+    require_once 'models/equipoTiposModel.php';
+    $tipos = new EquipoTiposModel();
+    return $tipos->getAll();
   }
 }

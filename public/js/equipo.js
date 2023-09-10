@@ -162,3 +162,43 @@ $(document).on("click", "button.edit", function () {
     "json"
   );
 });
+
+// Eliminar equipo
+$(document).on("click", "button.delete", function () {
+  let id = $(this).attr("id"),
+    row = $(this).parent().parent();
+  swal({
+    title: "¿Seguro de querer eliminar?",
+    text: "",
+    icon: "warning",
+    buttons: true,
+    dangerMode: true,
+  }).then((confirm) => {
+    if (confirm) {
+      $.post(
+        "equipo/delete",
+        { id },
+        function (data, textStatus, jqXHR) {
+          if ("success" in data) {
+            iziToast.success({
+              title: "Éxito, ",
+              message: data.success,
+              position: "topCenter",
+              displayMode: 1,
+            });
+            // Eliminar row del equipo
+            $("#table_equipo").DataTable().row(row).remove().draw();
+          } else {
+            iziToast.error({
+              title: "Error, ",
+              message: data.error,
+              position: "topCenter",
+              displayMode: 1,
+            });
+          }
+        },
+        "json"
+      );
+    }
+  });
+});

@@ -24,6 +24,8 @@
             </button>
           </div>
           <div class="card-body">
+            <div class="mb-2"><?php $this->showMessages() ?></div>
+
             <div class="table-responsive">
               <table class="table table-striped w-100" id="table_equipo">
                 <thead>

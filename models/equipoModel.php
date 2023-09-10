@@ -67,4 +67,15 @@ class EquipoModel extends Model
       return false;
     }
   }
+
+  public function delete($id)
+  {
+    try {
+      $query = $this->prepare("DELETE FROM equipos WHERE id = ?;");
+      return $query->execute([$id]);
+    } catch (PDOException $e) {
+      error_log("EquipoModel::delete() -> " . $e->getMessage());
+      return false;
+    }
+  }
 }

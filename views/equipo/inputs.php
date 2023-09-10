@@ -2,11 +2,10 @@
   <label for="tipo">Tipo</label>
   <select id="tipo" name="tipo" class="form-control" required>
     <option value="" selected disabled>__ Seleccione __</option>
-    <option value="1">Laptop</option>
     <?php
-    // foreach ($this->d['tipos'] as $tipo) {
-    //   echo "<option value='{$tipo['id']}'>{$tipo['tipo']}</option>";
-    // }
+    foreach ($this->d['tipos'] as $tipo) {
+      echo "<option value='{$tipo['id']}'>{$tipo['tipo']}</option>";
+    }
     ?>
   </select>
   <div class="invalid-feedback">
