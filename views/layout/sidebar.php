@@ -29,6 +29,11 @@
           <li><a class="nav-link" href="<?= URL ?>equipotipos">Tipos</a></li>
         </ul>
       </li>
+      <li class="dropdown">
+        <a href="<?= URL ?>reparacion" class="nav-link">
+          <i data-feather="aperture"></i><span>Reparaciones</span>
+        </a>
+      </li>
     </ul>
   </aside>
 </div>

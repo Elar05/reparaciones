@@ -3,11 +3,6 @@
 <link rel="stylesheet" href="<?= URL ?>public/bundles/datatables/datatables.min.css">
 <link rel="stylesheet" href="<?= URL ?>public/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css">
 
-<style>
-  .error {
-    color: #fc544b !important;
-  }
-</style>
 <?php require_once 'views/layout/header.php'; ?>
 
 <!-- Main Content -->

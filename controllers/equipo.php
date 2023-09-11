@@ -135,4 +135,12 @@ class Equipo extends Controller
     $tipos = new EquipoTiposModel();
     return $tipos->getAll();
   }
+
+  public function getEquiposByCliente()
+  {
+    if (empty($_POST['documento'])) $this->response(["error" => "Faltan parametros"]);
+
+    $equipos = $this->model->getAll("c.documento", $_POST['documento']);
+    $this->response(["equipos" => $equipos]);
+  }
 }

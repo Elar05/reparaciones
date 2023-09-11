@@ -95,7 +95,7 @@
 
             <div class="col-md-6 col-12 form-group">
               <label for="telefono">Teléfono</label>
-              <input type="text" id="telefono" name="telefono" class="form-control" pattern="[0-9]+" required>
+              <input type="text" id="telefono" name="telefono" class="form-control" pattern="[0-9]+" maxlength="9" required>
               <div class="invalid-feedback">
                 Oh no! Teléfono is invalid.
               </div>
