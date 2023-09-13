@@ -1,3 +1,19 @@
+// Load table
+function loadTable() {
+  $("#table_reparacion").DataTable({
+    destroy: true,
+    ajax: {
+      type: "post",
+      url: "reparacion/list",
+      data: {},
+    },
+    order: [[0, "desc"]],
+  });
+}
+$(document).ready(function () {
+  loadTable();
+});
+
 // Establecer la acción => create
 $("#add_reparacion").click(function (e) {
   e.preventDefault();

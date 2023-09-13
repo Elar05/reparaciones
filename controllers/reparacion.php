@@ -15,6 +15,53 @@ class Reparacion extends Controller
     ]);
   }
 
+  public function list()
+  {
+    $data = [];
+    $reparaciones = $this->model->getAll();
+    if (count($reparaciones) > 0) {
+      foreach ($reparaciones as $reparacion) {
+        $botones = "<button class='btn btn-warning edit' id='{$reparacion["id"]}'><i class='fas fa-pencil-alt'></i></button>";
+        $botones .= "<button class='btn btn-danger delete' id='{$reparacion["id"]}'><i class='fas fa-times'></i></button>";
+
+        $arrEstado = [
+          "0" => ["class" => "info", "text" => "En espera"],
+          "1" => ["class" => "warning", "text" => "En proceso"],
+          "2" => ["class" => "success", "text" => "Terminado"],
+        ];
+        $estado = $reparacion["estado"];
+        $class = $arrEstado[$estado]["class"];
+        $txt = $arrEstado[$estado]["text"];
+
+        $estado = "<span class='badge badge-$class text-uppercase mr-2'>$txt</span>";
+        $estado .= "<div class='btn-group dropleft'>
+          <button type='button' class='btn btn-primary dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+            <i class='fas fa-cogs'></i>
+          </button>
+          <div class='dropdown-menu dropleft'>
+            <button class='dropdown-item estado' id='{$reparacion["id"]}' estado='0'><i class='fas fa-pause text-info'></i> En espera</button>
+            <button class='dropdown-item estado' id='{$reparacion["id"]}' estado='1'><i class='fas fa-spinner text-warning'></i> En proceso</button>
+            <button class='dropdown-item estado' id='{$reparacion["id"]}' estado='2'><i class='fas fa-check text-success'></i> Terminado</button>
+          </div>
+        </div>";
+
+        $data[] = [
+          $reparacion["id"],
+          $reparacion["usuario"],
+          $reparacion["cliente"],
+          $reparacion["modelo"] . " - " . $reparacion["n_serie"],
+          $reparacion["costo"],
+          $reparacion["f_inicio"],
+          $reparacion["f_fin"],
+          $estado,
+          $botones
+        ];
+      }
+    }
+
+    $this->response(["data" => $data]);
+  }
+
   public function create()
   {
     if (
