@@ -21,6 +21,18 @@ class ReparacionModel extends Model
     }
   }
 
+  public function get($id, $column = "id")
+  {
+    try {
+      $query = $this->prepare("SELECT r.*, u.nombres AS usuario, e.modelo, e.n_serie, e.idtipo_equipo, e.descripcion, et.tipo, c.documento, c.nombres AS cliente, c.email, c.telefono FROM reparaciones r JOIN usuarios u ON r.idusuario = u.id JOIN equipos e ON r.idequipo = e.id JOIN equipo_tipos et ON e.idtipo_equipo = et.id JOIN clientes c ON e.idcliente = c.id WHERE r.$column = ?;");
+      $query->execute([$id]);
+      return $query->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log("ReparacionModel::get() -> " . $e->getMessage());
+      return false;
+    }
+  }
+
   public function save($data)
   {
     try {
@@ -32,6 +44,36 @@ class ReparacionModel extends Model
       return $query->execute();
     } catch (PDOException $e) {
       error_log("ReparacionModel::save() -> " . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function update($datos, $id)
+  {
+    try {
+      $sql = "UPDATE reparaciones SET ";
+      foreach ($datos as $columna => $valor) {
+        $sql .= "$columna = '$valor', ";
+      }
+
+      $sql = rtrim($sql, ', '); // elimina la última coma y el espacio
+      $sql .= " WHERE id = $id;";
+      $query = $this->query($sql);
+      return $query->execute();
+    } catch (PDOException $e) {
+      error_log("ReparacionModel::update() -> " . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function delete($id)
+  {
+    try {
+      $query = $this->prepare("DELETE FROM reparaciones WHERE id = :id;");
+      $query->bindValue(':id', $id, PDO::PARAM_INT);
+      return $query->execute();
+    } catch (PDOException $e) {
+      error_log('ReparacionModel::delete() -> ' . $e->getMessage());
       return false;
     }
   }

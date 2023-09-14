@@ -21,6 +21,8 @@ $("#add_reparacion").click(function (e) {
   $("#form_reparacion")[0].reset();
 
   $(".clean_equipo").val("");
+  $(".clean_equipo").removeAttr("disabled");
+  $(".inputs_disabled").removeAttr("disabled");
 
   $("#equipo").empty();
   $("#equipo").append(
@@ -184,8 +186,7 @@ $("#form_reparacion").submit(function (e) {
             position: "topCenter",
             displayMode: 1,
           });
-          // loadTable();
-          form[0].reset();
+          loadTable();
           $("#modal_reparacion").modal("toggle");
         } else {
           iziToast.error({
@@ -201,4 +202,134 @@ $("#form_reparacion").submit(function (e) {
   }
 
   form.addClass("was-validated");
+});
+
+// Llenar el form reparacion
+$(document).on("click", "button.edit", function () {
+  $("#form_reparacion")[0].reset();
+  $(".input_hidden").val("");
+
+  $("#equipo").empty();
+  $("#equipo").append(
+    "<option value='' selected disabled>__ Seleccione __</option>"
+  );
+  $("#modal_reparacion").modal("toggle");
+
+  $("#action").val("edit");
+  let id = $(this).attr("id");
+  $.post(
+    `reparacion/get`,
+    { id },
+    function (data, textStatus, jqXHR) {
+      if ("reparacion" in data) {
+        $("#id").val(data.reparacion.id);
+        $("#detalle").val(data.reparacion.detalle);
+        $("#costo").val(data.reparacion.costo);
+        $("#usuario").val(data.reparacion.idusuario);
+
+        $("#documento")
+          .val(data.reparacion.documento)
+          .attr("disabled", "disabled");
+        $("#nombres").val(data.reparacion.nombres).attr("disabled", "disabled");
+        $("#email").val(data.reparacion.email).attr("disabled", "disabled");
+        $("#telefono")
+          .val(data.reparacion.telefono)
+          .attr("disabled", "disabled");
+
+        $("#tipo")
+          .val(data.reparacion.idtipo_equipo)
+          .attr("disabled", "disabled");
+        $("#modelo").val(data.reparacion.modelo).attr("disabled", "disabled");
+        $("#n_serie").val(data.reparacion.n_serie).attr("disabled", "disabled");
+        $("#descripcion")
+          .val(data.reparacion.descripcion)
+          .attr("disabled", "disabled");
+
+        $("#tab-cliente").removeClass("active disabled");
+        $("#tab-equipo").removeClass("active disabled");
+        $("#tab-reparacion").removeClass("disabled").addClass("active");
+
+        $("#tab_cliente").removeClass("active show");
+        $("#tab_equipo").removeClass("active show");
+        $("#tab_reparacion").addClass("active show");
+      } else {
+        iziToast.error({
+          title: "Error, ",
+          message: data.error,
+          position: "topCenter",
+          displayMode: 1,
+        });
+      }
+    },
+    "json"
+  );
+});
+
+// Eliminar reparación
+$(document).on("click", "button.delete", function () {
+  let row = $(this).parent().parent();
+  let id = $(this).attr("id");
+  swal({
+    title: "¿Seguro de querer eliminar?",
+    text: "",
+    icon: "warning",
+    buttons: true,
+    dangerMode: true,
+  }).then((willDelete) => {
+    if (willDelete) {
+      $.post(
+        `reparacion/delete`,
+        { id },
+        function (data, textStatus, jqXHR) {
+          if ("success" in data) {
+            iziToast.success({
+              title: "Éxito, ",
+              message: data.success,
+              position: "topCenter",
+              displayMode: 1,
+            });
+            // Eliminar row del reparacion eliminado
+            $("#table_reparacion").DataTable().row(row).remove().draw();
+          } else {
+            iziToast.error({
+              title: "Error, ",
+              message: data.error,
+              position: "topCenter",
+              displayMode: 1,
+            });
+          }
+        },
+        "json"
+      );
+    }
+  });
+});
+
+// Cambiar estado
+$(document).on("click", "button.estado", function () {
+  let id = $(this).attr("id"),
+    estado = $(this).attr("estado");
+  $.post(
+    `reparacion/updateStatus`,
+    { id, estado },
+    function (data, textStatus, jqXHR) {
+      if ("success" in data) {
+        iziToast.success({
+          title: "Éxito, ",
+          message: data.success,
+          position: "topCenter",
+          displayMode: 1,
+        });
+        loadTable();
+      } else {
+        iziToast.error({
+          title: "Error, ",
+          message: data.error,
+          position: "topCenter",
+          displayMode: 1,
+        });
+      }
+    },
+    "json"
+  );
 });

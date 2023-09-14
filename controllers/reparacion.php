@@ -62,6 +62,20 @@ class Reparacion extends Controller
     $this->response(["data" => $data]);
   }
 
+  public function get()
+  {
+    if (empty($_POST['id'])) {
+      $this->response(["error" => "Faltan parametros"]);
+    }
+
+    $reparacion = $this->model->get($_POST['id']);
+    if ($reparacion) {
+      $this->response(["reparacion" => $reparacion]);
+    } else {
+      $this->response(["error" => "Error al buscar info"]);
+    }
+  }
+
   public function create()
   {
     if (
@@ -115,6 +129,58 @@ class Reparacion extends Controller
       $this->response(["success" => "Reparación registrada"]);
     } else {
       $this->response(["error" => "Error al registrar repación"]);
+    }
+  }
+
+  public function edit()
+  {
+    if (
+      empty($_POST['id']) || empty($_POST['detalle']) ||
+      empty($_POST['costo']) || empty($_POST['usuario'])
+    ) {
+      $this->response(['error' => "Faltan parametros"]);
+    }
+
+    if ($this->model->update([
+      'detalle' => $_POST['detalle'],
+      'costo' => $_POST['costo'],
+      'idusuario' => $_POST['usuario']
+    ], $_POST['id'])) {
+      $this->response(["success" => "Edición con éxito"]);
+    } else {
+      $this->response(["error" => "Error al editar reparación"]);
+    }
+  }
+
+  public function delete()
+  {
+    if (empty($_POST['id'])) {
+      $this->response(['error' => "Faltan parametros"]);
+    }
+
+    if ($this->model->delete($_POST['id'])) {
+      $this->response(['success' => "Eliminado"]);
+    } else {
+      $this->response(['error' => "Error al eliminar"]);
+    }
+  }
+
+  public function updateStatus()
+  {
+    if (
+      !isset($_POST['id']) || empty($_POST['id']) ||
+      !isset($_POST['estado']) || $_POST['id'] == ""
+    ) {
+      $this->response(['error' => "Faltan parametros"]);
+    }
+
+    if ($this->model->update([
+      "estado" => $_POST["estado"],
+      "f_fin" => date("Y-m-d H:i:s")
+    ], $_POST["id"])) {
+      $this->response(["success" => "Estado actualizado"]);
+    } else {
+      $this->response(['error' => "Error al actualizar estado"]);
     }
   }
 
