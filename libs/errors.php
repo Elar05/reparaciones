@@ -25,6 +25,17 @@ class Errors
   const ERROR_EQUIPOTIPOS_DELETE          = "398fkj239dsjksd98";
   const ERROR_EQUIPOTIPOS_DELETE_EMPTY    = "alkf9898ads9adsf9";
 
+  const ERROR_VISTA_SAVE                  = "s99fd9du34jk34kj3";
+  const ERROR_VISTA_SAVE_EXISTS           = "d0d0347r75nd7md84";
+  const ERROR_VISTA_SAVE_EMPTY            = "72hd54m0cn6sn73n1";
+  const ERROR_VISTA_UPDATE                = "qwert7o5i5u5y6t7r";
+  const ERROR_VISTA_UPDATE_EMPTY          = "0a9e87y6b5ji4u3gf";
+  const ERROR_VISTA_UPDATE_EXISTS         = "jk78gh56fg43fd23a";
+  const ERROR_VISTA_DELETE                = "0o9i8u7y6t65re4e3";
+  const ERROR_VISTA_DELETE_EMPTY          = "0o9i0o9i0o9i0o9i0";
+
+  const ERROR_VISTA_DATA_INCORRECT        = "7sd87ds87ds87ds78d";
+
   private $errorList = [];
 
   public function __construct()
@@ -51,6 +62,17 @@ class Errors
       Errors::ERROR_EQUIPOTIPOS_UPDATE_EXISTS   => 'El tipo de equipo ya existe',
       Errors::ERROR_EQUIPOTIPOS_DELETE          => 'Error al eliminar tipo de equipo',
       Errors::ERROR_EQUIPOTIPOS_DELETE_EMPTY    => 'No se puede eliminar un tipo de equipo que no existe',
+
+      Errors::ERROR_VISTA_SAVE                  => 'Error al guardar vista',
+      Errors::ERROR_VISTA_SAVE_EXISTS           => 'La vista ya existe',
+      Errors::ERROR_VISTA_SAVE_EMPTY            => 'No se puede agregar un vista vacia',
+      Errors::ERROR_VISTA_UPDATE                => 'Error al actualizar vista',
+      Errors::ERROR_VISTA_UPDATE_EMPTY          => 'No se puede actualizar un vista vacia',
+      Errors::ERROR_VISTA_UPDATE_EXISTS         => 'La vista no existe',
+      Errors::ERROR_VISTA_DELETE                => 'Error al eliminar vista',
+      Errors::ERROR_VISTA_DELETE_EMPTY          => 'No se puede eliminar un vista que no existe',
+
+      Errors::ERROR_VISTA_DATA_INCORRECT        => 'Los valores son incorrectas',
     ];
   }
 

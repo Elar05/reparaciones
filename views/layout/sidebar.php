@@ -34,6 +34,11 @@
           <i data-feather="aperture"></i><span>Reparaciones</span>
         </a>
       </li>
+      <li class="dropdown">
+        <a href="<?= URL ?>vista" class="nav-link">
+          <i data-feather="aperture"></i><span>Vistas</span>
+        </a>
+      </li>
     </ul>
   </aside>
 </div>

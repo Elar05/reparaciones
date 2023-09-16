@@ -10,7 +10,8 @@ class UsuarioTipos extends Session
   public function render()
   {
     $this->view->render('usuariotipos/index', [
-      "tipos" => $this->model->getAll()
+      "tipos" => $this->model->getAll(),
+      "vistas" => $this->getVistas()
     ]);
   }
 
@@ -106,5 +107,12 @@ class UsuarioTipos extends Session
         "error" => Errors::ERROR_USUARIOTIPOS_DELETE
       ]);
     }
+  }
+
+  public function getVistas()
+  {
+    require_once 'models/vistaModel.php';
+    $vistas = new VistaModel;
+    return $vistas->getAll();
   }
 }

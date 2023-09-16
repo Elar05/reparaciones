@@ -33,7 +33,7 @@ class Session extends Controller
   {
     return [
       "0" => ['login'],
-      "1" => ['main', 'logout', 'usuario', 'usuariotipos', 'cliente', 'equipo', 'equipotipos', 'reparacion'],
+      "1" => ['main', 'logout', 'usuario', 'usuariotipos', 'cliente', 'equipo', 'equipotipos', 'reparacion', 'vista', 'permiso'],
       "2" => ['main', 'logout', 'cliente', 'equipo', 'equipotipos', 'reparacion'],
       "3" => ['main', 'logout', 'equipo', 'equipotipos', 'reparacion']
     ];
