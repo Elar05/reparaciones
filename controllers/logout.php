@@ -1,10 +1,7 @@
 <?php
 
-class Main extends Session
+class Logout extends Session
 {
-  public $model;
-  public $view;
-
   public function __construct($url)
   {
     parent::__construct($url);
@@ -12,6 +9,7 @@ class Main extends Session
 
   public function render()
   {
-    $this->view->render('main/index');
+    $this->logout();
+    $this->redirect("");
   }
 }

@@ -1,10 +1,10 @@
 <?php
 
-class Reparacion extends Controller
+class Reparacion extends Session
 {
-  public function __construct()
+  public function __construct($url)
   {
-    parent::__construct();
+    parent::__construct($url);
   }
 
   public function render()

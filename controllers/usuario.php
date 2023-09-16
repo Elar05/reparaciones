@@ -1,13 +1,13 @@
 <?php
 
-class Usuario extends Controller
+class Usuario extends Session
 {
   public $model;
   public $view;
 
-  public function __construct()
+  public function __construct($url)
   {
-    parent::__construct();
+    parent::__construct($url);
   }
 
   public function render()

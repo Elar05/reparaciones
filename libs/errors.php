@@ -3,6 +3,10 @@
 class Errors
 {
   // ERROR_controller_method - operation
+  const ERROR_LOGIN_AUTHENTICATE_DATA     = "87sd87ds78ds";
+  const ERROR_LOGIN_AUTHENTICATE_EMPTY    = "sd8f43h238798ds8998";
+  const ERROR_LOGIN_AUTHENTICATE_STATUS   = "sd8f43h238798ds8998";
+
   const ERROR_USUARIOTIPOS_SAVE           = "8as98fsadfasd6";
   const ERROR_USUARIOTIPOS_SAVE_EMPTY     = "7sd87s45d6ds76";
   const ERROR_USUARIOTIPOS_SAVE_EXISTS    = "7sd87554dffds76";
@@ -26,6 +30,10 @@ class Errors
   public function __construct()
   {
     $this->errorList = [
+      Errors::ERROR_LOGIN_AUTHENTICATE_DATA     => "Credenciales incorrectas",
+      Errors::ERROR_LOGIN_AUTHENTICATE_EMPTY    => "Rellene el formulario",
+      Errors::ERROR_LOGIN_AUTHENTICATE_STATUS   => "El usuario no esta activo",
+
       Errors::ERROR_USUARIOTIPOS_SAVE           => "Error al guardar tipo de usuario",
       Errors::ERROR_USUARIOTIPOS_SAVE_EMPTY     => "Complete el formulario",
       Errors::ERROR_USUARIOTIPOS_SAVE_EXISTS    => "El tipo de usuario ya esta registrado",

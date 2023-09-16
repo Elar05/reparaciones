@@ -8,14 +8,20 @@ class App
     $url = rtrim($url, '/');
     $url = explode('/', $url);
 
-    if (empty($url[0])) $url[0] = 'main';
+    if (empty($url[0])) {
+      require_once 'controllers/login.php';
+      $login = new Login('login');
+      $login->loadModel('login');
+      $login->render();
+      return false;
+    };
 
     $fileController = 'controllers/' . $url[0] . '.php';
 
     if (file_exists($fileController)) {
       require_once $fileController;
 
-      $controller = new $url[0];
+      $controller = new $url[0]($url[0]);
       $controller->loadModel($url[0]);
 
       // si hay un metodo
@@ -25,9 +31,7 @@ class App
           // Si hay parametros en la url
           if (isset($url[2])) {
             $nparam = sizeof($url);
-
             $params = [];
-
             for ($i = 2; $i < $nparam; $i++) {
               array_push($params, $url[$i]);
             }
@@ -38,19 +42,19 @@ class App
             $parameters = $reflection->getParameters();
 
             if (count($parameters) > 0 && empty($url[2])) {
-              $controller =  new Errores();
+              new Errores;
             } else {
               $controller->{$url[1]}();
             }
           }
         } else {
-          $controller = new Errores();
+          new Errores;
         }
       } else {
         $controller->render();
       }
     } else {
-      $controller = new Errores();
+      new Errores;
     }
   }
 }
