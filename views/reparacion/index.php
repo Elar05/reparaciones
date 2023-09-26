@@ -2,6 +2,7 @@
 
 <link rel="stylesheet" href="<?= URL ?>public/bundles/datatables/datatables.min.css">
 <link rel="stylesheet" href="<?= URL ?>public/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css">
+<link rel="stylesheet" href="<?= URL ?>public/bundles/bootstrap-daterangepicker/daterangepicker.css">
 
 <?php require_once 'views/layout/header.php'; ?>
 
@@ -19,6 +20,23 @@
                 <i class="fa fa-plus"></i> Agregar</button>
             </div>
             <div class="card-body">
+              <div class="row">
+                <div class="col-6">
+                  <label for="f_inicio">Fecha de inicio:</label>
+                  <input type="date" name="f_inicio" id="f_inicio">
+
+                  <label for="f_fin">Fecha de fin:</label>
+                  <input type="date" name="f_fin" id="f_fin">
+
+                  <button id="filtrarBtn" class="btn btn-info">Filtrar</button>
+                  <button id="clean_filtro" class="btn btn-success">Limpiar</button>
+                </div>
+
+                <div class="col-6">
+                  <input type="text" id="fechas" class="form-control daterange-cus">
+                </div>
+              </div>
+
               <div class="table-responsive">
                 <table class="table table-striped w-100" id="table_reparacion">
                   <thead>
@@ -148,6 +166,13 @@
 <!-- JS Libraies -->
 <script src="<?= URL ?>public/bundles/datatables/datatables.min.js"></script>
 <script src="<?= URL ?>public/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
+<script src="<?= URL ?>public/bundles/datatables/export-tables/dataTables.buttons.min.js"></script>
+<script src="<?= URL ?>public/bundles/datatables/export-tables/buttons.flash.min.js"></script>
+<script src="<?= URL ?>public/bundles/datatables/export-tables/jszip.min.js"></script>
+<script src="<?= URL ?>public/bundles/datatables/export-tables/pdfmake.min.js"></script>
+<script src="<?= URL ?>public/bundles/datatables/export-tables/vfs_fonts.js"></script>
+<script src="<?= URL ?>public/bundles/datatables/export-tables/buttons.print.min.js"></script>
+<script src="<?= URL ?>public/bundles/bootstrap-daterangepicker/daterangepicker.js"></script>
 
 <!-- Page Specific JS File -->
 <script src="<?= URL ?>public/js/reparacion.js" type="module"></script>

@@ -1,6 +1,6 @@
 // Load table
 function loadTable() {
-  $("#table_reparacion").DataTable({
+  let table = $("#table_reparacion").DataTable({
     destroy: true,
     ajax: {
       type: "post",
@@ -8,11 +8,85 @@ function loadTable() {
       data: {},
     },
     order: [[0, "desc"]],
+    dom: "Bfrtip",
+    buttons: ["copy", "csv", "excel", "pdf", "print"],
   });
+
+  let filtroActivo = false;
+
+  $("#filtrarBtn").click(function (e) {
+    e.preventDefault();
+    cleanFiltro();
+
+    let fechaInicio = $("#f_inicio").val();
+    let fechaFin = $("#f_fin").val();
+
+    if (fechaInicio != "" && fechaFin != "") {
+      filtrar(fechaInicio, fechaFin);
+    } else {
+      iziToast.info({
+        title: "Ingrese un rango de fechas a filtrar",
+        message: "",
+        position: "topCenter",
+        displayMode: 1,
+      });
+    }
+  });
+  $("#clean_filtro").click(function (e) {
+    e.preventDefault();
+    cleanFiltro();
+  });
+
+  $("#fechas").daterangepicker({
+    locale: {
+      format: "YYYY-MM-DD", // Formato de fecha deseado
+      cancelLabel: "Cancelar",
+      applyLabel: "Filtrar",
+    },
+    drops: "down",
+    opens: "right",
+  });
+
+  $("#fechas").on("apply.daterangepicker", function (ev, picker) {
+    cleanFiltro();
+    let fechaInicio = picker.startDate.format("YYYY-MM-DD");
+    let fechaFin = picker.endDate.format("YYYY-MM-DD");
+    filtrar(fechaInicio, fechaFin);
+  });
+  $("#fechas").on("cancel.daterangepicker", function (ev, picker) {
+    cleanFiltro();
+  });
+
+  function filtrar(fechaInicio, fechaFin) {
+    // Aplicar filtro al datatable
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+      let fechaRegistro = formatFecha(data[5]);
+
+      if (fechaRegistro >= fechaInicio && fechaRegistro <= fechaFin) {
+        return true;
+      }
+      return false;
+    });
+    table.draw();
+    filtroActivo = true;
+  }
+  function cleanFiltro() {
+    if (filtroActivo) {
+      $.fn.dataTable.ext.search.pop();
+      table.draw();
+      filtroActivo = false;
+    }
+  }
 }
 $(document).ready(function () {
   loadTable();
 });
+
+function formatFecha(fecha) {
+  // Función para formatear la fecha "y-m-d h:i:s" a "y-m-d"
+  let date = fecha.split(" ");
+  return date[0];
+}
 
 // Establecer la acción => create
 $("#add_reparacion").click(function (e) {
