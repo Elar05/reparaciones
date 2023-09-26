@@ -12,7 +12,8 @@ class ReparacionModel extends Model
     try {
       $sql = "";
       if ($column !== null && $value !== null) $sql = " WHERE $column = '$value'";
-      $query = $this->query("SELECT r.*, u.nombres AS usuario, e.modelo, e.n_serie, e.idtipo_equipo, e.descripcion, et.tipo, c.documento, c.nombres AS cliente, c.email, c.telefono FROM reparaciones r JOIN usuarios u ON r.idusuario = u.id JOIN equipos e ON r.idequipo = e.id JOIN equipo_tipos et ON e.idtipo_equipo = et.id JOIN clientes c ON e.idcliente = c.id$sql;");
+      $q = "SELECT r.*, u.nombres AS usuario, e.modelo, e.n_serie, e.idtipo_equipo, et.tipo, c.documento, c.nombres AS cliente, c.email, c.telefono FROM reparaciones r JOIN usuarios u ON r.idusuario = u.id JOIN equipos e ON r.idequipo = e.id JOIN equipo_tipos et ON e.idtipo_equipo = et.id JOIN clientes c ON e.idcliente = c.id$sql;";
+      $query = $this->query($q);
       $query->execute();
       return $query->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
@@ -24,7 +25,7 @@ class ReparacionModel extends Model
   public function get($id, $column = "id")
   {
     try {
-      $query = $this->prepare("SELECT r.*, u.nombres AS usuario, e.modelo, e.n_serie, e.idtipo_equipo, e.descripcion, et.tipo, c.documento, c.nombres AS cliente, c.email, c.telefono FROM reparaciones r JOIN usuarios u ON r.idusuario = u.id JOIN equipos e ON r.idequipo = e.id JOIN equipo_tipos et ON e.idtipo_equipo = et.id JOIN clientes c ON e.idcliente = c.id WHERE r.$column = ?;");
+      $query = $this->prepare("SELECT r.*, u.nombres AS usuario, e.modelo, e.n_serie, e.idtipo_equipo, et.tipo, c.documento, c.nombres AS cliente, c.email, c.telefono FROM reparaciones r JOIN usuarios u ON r.idusuario = u.id JOIN equipos e ON r.idequipo = e.id JOIN equipo_tipos et ON e.idtipo_equipo = et.id JOIN clientes c ON e.idcliente = c.id WHERE r.$column = ?;");
       $query->execute([$id]);
       return $query->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {

@@ -17,8 +17,16 @@ class Reparacion extends Session
 
   public function list()
   {
+    $column = null;
+    $value = null;
+
+    if ($this->userType === 3) {
+      $column = "r.idusuario";
+      $value = $this->userId;
+    }
+
     $data = [];
-    $reparaciones = $this->model->getAll();
+    $reparaciones = $this->model->getAll($column, $value);
     if (count($reparaciones) > 0) {
       foreach ($reparaciones as $reparacion) {
         $botones = "<button class='btn btn-warning edit' id='{$reparacion["id"]}'><i class='fas fa-pencil-alt'></i></button>";

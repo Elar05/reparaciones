@@ -6,15 +6,17 @@
     </div>
     <ul class="sidebar-menu">
       <li class="menu-header">Menu</li>
-      <li class="dropdown">
-        <a href="#" class="menu-toggle nav-link has-dropdown">
-          <i data-feather="user"></i><span>Usuarios</span>
-        </a>
-        <ul class="dropdown-menu">
-          <li><a class="nav-link" href="<?= URL ?>usuario">Listado</a></li>
-          <li><a class="nav-link" href="<?= URL ?>usuariotipos">Tipos</a></li>
-        </ul>
-      </li>
+      <?php if ($this->data['tipo'] === 1 || $this->data['tipo'] === 2) : ?>
+        <li class="dropdown">
+          <a href="#" class="menu-toggle nav-link has-dropdown">
+            <i data-feather="user"></i><span>Usuarios</span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="nav-link" href="<?= URL ?>usuario">Listado</a></li>
+            <li><a class="nav-link" href="<?= URL ?>usuariotipos">Tipos</a></li>
+          </ul>
+        </li>
+      <?php endif; ?>
       <li class="dropdown">
         <a href="<?= URL ?>cliente" class="nav-link">
           <i data-feather="users"></i><span>Clientes</span>
@@ -34,11 +36,13 @@
           <i data-feather="aperture"></i><span>Reparaciones</span>
         </a>
       </li>
-      <li class="dropdown">
-        <a href="<?= URL ?>vista" class="nav-link">
-          <i data-feather="aperture"></i><span>Vistas</span>
-        </a>
-      </li>
+      <?php if ($this->data['tipo'] === 1) : ?>
+        <li class="dropdown">
+          <a href="<?= URL ?>vista" class="nav-link">
+            <i data-feather="aperture"></i><span>Vistas</span>
+          </a>
+        </li>
+      <?php endif; ?>
     </ul>
   </aside>
 </div>

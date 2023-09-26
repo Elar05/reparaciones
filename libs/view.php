@@ -3,6 +3,12 @@
 class View
 {
   public $d;
+  public $data;
+
+  public function __construct($data = [])
+  {
+    $this->data = $data;
+  }
 
   public function render($name, $data = [])
   {

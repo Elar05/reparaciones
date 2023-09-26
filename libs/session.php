@@ -26,17 +26,21 @@ class Session extends Controller
 
     $this->validateSession();
 
-    parent::__construct();
+    parent::__construct(["user" => $this->user, "tipo" => $this->userType]);
   }
 
   public function sites()
   {
-    return [
-      "0" => ['login'],
-      "1" => ['main', 'logout', 'usuario', 'usuariotipos', 'cliente', 'equipo', 'equipotipos', 'reparacion', 'vista', 'permiso'],
-      "2" => ['main', 'logout', 'cliente', 'equipo', 'equipotipos', 'reparacion'],
-      "3" => ['main', 'logout', 'equipo', 'equipotipos', 'reparacion']
-    ];
+    require_once 'models/permisoModel.php';
+    $permisos = new PermisoModel;
+    return $permisos->getPermisosByType($this->userType);
+
+    // return [
+    //   "0" => ['login'],
+    //   "1" => ['main', 'logout', 'usuario', 'usuariotipos', 'cliente', 'equipo', 'equipotipos', 'reparacion', 'vista', 'permiso'],
+    //   "2" => ['main', 'logout', 'cliente', 'equipo', 'equipotipos', 'reparacion'],
+    //   "3" => ['main', 'logout', 'equipo', 'equipotipos', 'reparacion']
+    // ];
   }
 
   public function validateSession()
@@ -64,7 +68,8 @@ class Session extends Controller
 
   public function isAuthorized($view, $userType)
   {
-    return in_array($view, $this->sites[$userType]);
+    return in_array($view, $this->sites);
+    // return in_array($view, $this->sites[$userType]);
   }
 
   public function initialize($user)

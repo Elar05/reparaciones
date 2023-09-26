@@ -52,4 +52,24 @@ class PermisoModel extends Model
       return false;
     }
   }
+
+  public function getPermisosByType($tipo)
+  {
+    try {
+      $permisos = ['login'];
+      if ($tipo === 0) return $permisos;
+
+      $query = $this->prepare("SELECT v.vista FROM permisos p JOIN vistas v ON p.idvista = v.id WHERE p.idtipo_usuario = :tipo");
+      $query->execute([":tipo" => $tipo]);
+      $data = $query->fetchAll(PDO::FETCH_ASSOC);
+      $permisos = [];
+      foreach ($data as $item) {
+        $permisos[] = $item['vista'];
+      }
+      return $permisos;
+    } catch (PDOException $e) {
+      error_log('PermisoModel::getPermisosByType() -> ' . $e->getMessage());
+      return false;
+    }
+  }
 }

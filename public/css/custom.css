@@ -1,3 +1,11 @@
+:root {
+  --gray-color: #96a2b4;
+}
+
+.color-gray {
+  color: var(--gray-color);
+}
+
 .error {
   color: #fc544b !important;
 }

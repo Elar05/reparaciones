@@ -5,9 +5,9 @@ class Controller
   public $model;
   public $view;
 
-  public function __construct()
+  public function __construct($data)
   {
-    $this->view = new View();
+    $this->view = new View($data);
   }
 
   public function loadModel($name)
