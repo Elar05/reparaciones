@@ -72,6 +72,6 @@
 <script src="<?= URL ?>public/bundles/datatables/datatables.min.js"></script>
 <script src="<?= URL ?>public/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
 
-<script src="<?= URL ?>public/js/cliente.js"></script>
+<script src="<?= URL ?>public/js/cliente.js" type="module"></script>
 
 <?php require_once 'views/layout/foot.php'; ?>

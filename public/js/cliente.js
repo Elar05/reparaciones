@@ -1,12 +1,16 @@
+import { getCliente } from "./exports.js";
+
 // Loadtable
 function loadTable() {
   $("#table_cliente").DataTable({
     destroy: true,
+    processing: true,
+    serverSide: true,
     ajax: {
       type: "POST",
       url: "cliente/list",
     },
-    order: [[0, "desc"]],
+    ordering: false,
   });
 }
 $(document).ready(function () {
@@ -65,29 +69,26 @@ $("#form_cliente").submit(function (e) {
 // Buscar cliente
 $("#search_cliente").click(function (e) {
   e.preventDefault();
-  let documento = $("#documento").val();
-  $.post(
-    "cliente/get",
-    { value: documento, column: "documento" },
-    function (data, textStatus, jqXHR) {
-      if ("success" in data) {
-        iziToast.success({
-          title: "Éxito, ",
-          message: data.success,
-          position: "topCenter",
-          displayMode: 1,
-        });
-      } else {
-        iziToast.error({
-          title: "Error, ",
-          message: data.error,
-          position: "topCenter",
-          displayMode: 1,
-        });
-      }
-    },
-    "json"
-  );
+  let seriedoc = $("#seriedoc");
+  getCliente({ value: seriedoc.val(), column: "seriedoc" }, (data) => {
+    if ("error" in data) {
+      iziToast.error({
+        title: "Error, ",
+        message: data.error,
+        position: "topCenter",
+        displayMode: 1,
+      });
+    } else {
+      iziToast.info({
+        title: "El cliente ya está registrado",
+        message: "",
+        position: "topCenter",
+        displayMode: 1,
+      });
+      seriedoc.val("");
+      seriedoc.focus();
+    }
+  });
 });
 
 // Editar cliente
@@ -101,11 +102,13 @@ $(document).on("click", "button.edit", function () {
     { value: id },
     function (data, textStatus, jqXHR) {
       if ("cliente" in data) {
-        $("#id").val(data.cliente.id);
-        $("#nombres").val(data.cliente.nombres);
-        $("#email").val(data.cliente.email);
-        $("#telefono").val(data.cliente.telefono);
-        $("#documento").val(data.cliente.documento);
+        const { id, seriedoc, nombres, email, telefono, direccion } = data.cliente;
+        $("#id").val(id);
+        $("#nombres").val(nombres);
+        $("#email").val(email);
+        $("#telefono").val(telefono);
+        $("#seriedoc").val(seriedoc);
+        $("#direccion").val(direccion);
       } else {
         iziToast.error({
           title: "Error, ",
