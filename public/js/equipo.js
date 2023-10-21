@@ -1,3 +1,10 @@
+import {
+  changeMaxDoc,
+  getCliente,
+  getDataSelect,
+  saveTipoOrMarcaOrModelo,
+} from "./exports.js";
+
 // Loadtable
 function loadTable() {
   $("#table_equipo").DataTable({
@@ -11,6 +18,9 @@ function loadTable() {
 }
 $(document).ready(function () {
   loadTable();
+  $(".select2").select2({ dropdownParent: $(".modal") });
+  getDataSelect("tipo", "tipo/list", { data: 1 });
+  getDataSelect("marca", "marca/list", { data: 1 });
 });
 
 // Establecer la acción => create
@@ -25,6 +35,11 @@ $("#add_equipo").click(function (e) {
   $("#tab_cliente").addClass("active show");
   $("#tab_equipo").removeClass("active show");
 
+  $(".input_cliente").removeAttr("disabled");
+  $("#tipo").val("").trigger("change.select2");
+  $("#marca").val("").trigger("change.select2");
+  getDataSelect("modelo");
+
   $("#form_equipo").removeClass("was-validated");
 });
 
@@ -32,9 +47,8 @@ $("#add_equipo").click(function (e) {
 $("#next").click(function (e) {
   e.preventDefault();
   if (
-    $("#documento").val() === "" ||
+    $("#seriedoc").val() === "" ||
     $("#nombres").val() === "" ||
-    $("#email").val() === "" ||
     $("#telefono").val() === ""
   ) {
     $("#form_equipo").addClass("was-validated");
@@ -49,7 +63,6 @@ $("#next").click(function (e) {
 
   $("#tab-cliente").removeClass("active");
   $("#tab-equipo").addClass("active").removeClass("disabled");
-
   $("#tab_cliente").removeClass("active show");
   $("#tab_equipo").addClass("active show");
 
@@ -98,28 +111,25 @@ $("#form_equipo").submit(function (e) {
 // Buscar cliente
 $("#search_cliente").click(function (e) {
   e.preventDefault();
-  $.post(
-    "cliente/get",
-    { value: $("#documento").val(), column: "documento" },
-    function (data, textStatus, jqXHR) {
-      if ("error" in data) {
-        iziToast.error({
-          title: "Error, ",
-          message: data.error,
-          position: "topCenter",
-          displayMode: 1,
-        });
-        $("#nombres").val("");
-        $("#email").val("");
-        $("#telefono").val("");
-      } else {
-        $("#nombres").val(data.cliente.nombres);
-        $("#email").val(data.cliente.email);
-        $("#telefono").val(data.cliente.telefono);
-      }
-    },
-    "json"
-  );
+  getCliente({ value: $("#seriedoc").val(), column: "seriedoc" }, (data) => {
+    if ("error" in data) {
+      iziToast.error({
+        title: "Error, ",
+        message: data.error,
+        position: "topCenter",
+        displayMode: 1,
+      });
+      $("#nombres").val("");
+      $("#email").val("");
+      $("#telefono").val("");
+      $("#direccion").val("");
+    } else {
+      $("#nombres").val(data.cliente.nombres);
+      $("#email").val(data.cliente.email);
+      $("#telefono").val(data.cliente.telefono);
+      $("#direccion").val(data.cliente.direccion);
+    }
+  });
 });
 
 // Mostrar los datos del equipo en el modal
@@ -135,19 +145,19 @@ $(document).on("click", "button.edit", function () {
       if ("equipo" in data) {
         $("#id").val(data.equipo.id);
 
-        $("#documento").val(data.equipo.documento).attr("disabled", "disabled");
+        $("#seriedoc").val(data.equipo.seriedoc).attr("disabled", "disabled");
         $("#nombres").val(data.equipo.nombres).attr("disabled", "disabled");
         $("#email").val(data.equipo.email).attr("disabled", "disabled");
         $("#telefono").val(data.equipo.telefono).attr("disabled", "disabled");
+        $("#direccion").val(data.equipo.direccion).attr("disabled", "disabled");
 
-        $("#tipo").val(data.equipo.idtipo_equipo);
-        $("#modelo").val(data.equipo.modelo);
+        $("#tipo").val(data.equipo.idtipo);
+        $("#marca").val(data.equipo.idmarca);
+        $("#modelo").val(data.equipo.idmodelo);
         $("#n_serie").val(data.equipo.n_serie);
-        $("#descripcion").val(data.equipo.descripcion);
 
         $("#tab-cliente").removeClass("active");
         $("#tab-equipo").removeClass("disabled").addClass("active");
-
         $("#tab_equipo").addClass("active show");
         $("#tab_cliente").removeClass("active show");
       } else {
@@ -201,4 +211,90 @@ $(document).on("click", "button.delete", function () {
       );
     }
   });
+});
+
+// Traer las modelos por marca y tipo
+$("#tipo, #marca").change(function () {
+  getDataSelect("modelo", "modelo/getAllByMarcaAndTipo", {
+    tipo: $("#tipo").val(),
+    marca: $("#marca").val(),
+  });
+});
+
+// Agregar o cancelar
+$(".cancel_add_tipo").click(function (e) {
+  e.preventDefault();
+  $(".group_tipo").toggleClass("d-none");
+});
+$(".cancel_add_marca").click(function (e) {
+  e.preventDefault();
+  $(".group_marca").toggleClass("d-none");
+});
+$(".cancel_add_modelo").click(function (e) {
+  e.preventDefault();
+  $(".group_modelo").toggleClass("d-none");
+});
+
+// Guardar nuevo tipo
+$("#save_new_tipo").click(function (e) {
+  e.preventDefault();
+  if ($("#new_tipo").val() == "") {
+    iziToast.warning({
+      title: "Ingrese tipo",
+      message: "",
+      position: "topCenter",
+      displayMode: 1,
+    });
+  } else {
+    $(".group_tipo").toggleClass("d-none");
+    saveTipoOrMarcaOrModelo("tipo/create", { nombre: $("#new_tipo").val() });
+    getDataSelect("tipo", "tipo/list", { data: 1 });
+    getDataSelect("modelo");
+  }
+});
+// Guardar nuevo marca
+$("#save_new_marca").click(function (e) {
+  e.preventDefault();
+  if ($("#new_marca").val() == "") {
+    iziToast.warning({
+      title: "Ingrese marca",
+      message: "",
+      position: "topCenter",
+      displayMode: 1,
+    });
+  } else {
+    $(".group_marca").toggleClass("d-none");
+    saveTipoOrMarcaOrModelo("marca/create", { nombre: $("#new_marca").val() });
+    getDataSelect("marca", "marca/list", { data: 1 });
+    getDataSelect("modelo");
+  }
+});
+// Guardar nuevo modelo
+$("#save_new_modelo").click(function (e) {
+  e.preventDefault();
+  if (
+    $("#tipo").val() == "" ||
+    $("#marca").val() == "" ||
+    $("#new_modelo").val() == ""
+  ) {
+    iziToast.warning({
+      title: "Ingrese datos",
+      message: "",
+      position: "topCenter",
+      displayMode: 1,
+    });
+  } else {
+    $(".group_modelo").toggleClass("d-none");
+
+    saveTipoOrMarcaOrModelo("modelo/create", {
+      tipo: $("#tipo").val(),
+      marca: $("#marca").val(),
+      nombre: $("#new_modelo").val(),
+    });
+
+    getDataSelect("modelo", "modelo/getAllByMarcaAndTipo", {
+      tipo: $("#tipo").val(),
+      marca: $("#marca").val(),
+    });
+  }
 });

@@ -13,7 +13,22 @@ class EquipoModel extends Model
       $sql = "";
       if ($column !== null && $value !== null) $sql = " WHERE $column = '$value'";
 
-      $query = $this->query("SELECT e.*, c.nombres AS cliente, et.tipo FROM equipos e JOIN clientes c ON e.idcliente = c.id JOIN equipo_tipos et ON e.idtipo_equipo = et.id$sql;");
+      $query = $this->query(
+        "SELECT
+          e.id,
+          e.n_serie,
+          e.f_registro,
+          c.nombres AS cliente,
+          m.nombre AS modelo,
+          t.nombre AS tipo,
+          ma.nombre AS marca
+        FROM equipos e
+          INNER JOIN clientes c ON e.idcliente = c.id
+          INNER JOIN modelos m ON e.idmodelo = m.id
+          INNER JOIN tipos t ON m.idtipo = t.id
+          INNER JOIN marcas ma ON m.idmarca = ma.id
+        $sql;"
+      );
       $query->execute();
       return $query->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
@@ -25,7 +40,24 @@ class EquipoModel extends Model
   public function get($id, $column = "id")
   {
     try {
-      $query = $this->prepare("SELECT e.*, c.documento, c.nombres, c.email, c.telefono FROM equipos e JOIN clientes c ON e.idcliente = c.id WHERE e.$column = ?;");
+      $query = $this->prepare(
+        "SELECT
+          e.id,
+          e.n_serie,
+          m.nombre AS modelo,
+          t.nombre AS tipo,
+          ma.nombre AS marca,
+          m.id AS idmodelo,
+          m.idtipo,
+          m.idmarca,
+          c.*
+        FROM equipos e
+          INNER JOIN clientes c ON e.idcliente = c.id
+          INNER JOIN modelos m ON e.idmodelo = m.id
+          INNER JOIN tipos t ON m.idtipo = t.id
+          INNER JOIN marcas ma ON m.idmarca = ma.id
+        WHERE e.$column = ?;"
+      );
       $query->execute([$id]);
       return $query->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
@@ -38,12 +70,10 @@ class EquipoModel extends Model
   {
     try {
       $pdo = $this->connect();
-      $query = $pdo->prepare("INSERT INTO equipos (idcliente, idtipo_equipo, modelo, n_serie, descripcion) VALUES (:idcliente, :idtipo_equipo, :modelo, :n_serie, :descripcion);");
+      $query = $pdo->prepare("INSERT INTO equipos (idcliente, idmodelo, n_serie) VALUES (:idcliente, :idmodelo, :n_serie);");
       $query->bindParam(':idcliente', $data['idcliente'], PDO::PARAM_STR);
-      $query->bindParam(':idtipo_equipo', $data['tipo'], PDO::PARAM_STR);
-      $query->bindParam(':modelo', $data['modelo'], PDO::PARAM_STR);
+      $query->bindParam(':idmodelo', $data['idmodelo'], PDO::PARAM_STR);
       $query->bindParam(':n_serie', $data['n_serie'], PDO::PARAM_STR);
-      $query->bindParam(':descripcion', $data['descripcion'], PDO::PARAM_STR);
       $query->execute();
       return $pdo->lastInsertId();
     } catch (PDOException $e) {
@@ -77,6 +107,34 @@ class EquipoModel extends Model
       return $query->execute([$id]);
     } catch (PDOException $e) {
       error_log("EquipoModel::delete() -> " . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function getAllByCliente($seriedoc)
+  {
+    try {
+      $query = $this->prepare(
+        "SELECT
+          e.id,
+          e.n_serie,
+          m.nombre AS modelo,
+          t.nombre AS tipo,
+          ma.nombre AS marca,
+          m.id AS idmodelo,
+          m.idtipo,
+          m.idmarca
+        FROM equipos e
+          INNER JOIN clientes c ON e.idcliente = c.id
+          INNER JOIN modelos m ON e.idmodelo = m.id
+          INNER JOIN tipos t ON m.idtipo = t.id
+          INNER JOIN marcas ma ON m.idmarca = ma.id
+        WHERE c.seriedoc = ?;"
+      );
+      $query->execute([$seriedoc]);
+      return $query->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log("EquipoModel::getAll() -> " . $e->getMessage());
       return false;
     }
   }

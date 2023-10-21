@@ -1,4 +1,4 @@
-import { getCliente } from "./exports.js";
+import { changeMaxDoc, getCliente } from "./exports.js";
 
 // Loadtable
 function loadTable() {
@@ -102,7 +102,8 @@ $(document).on("click", "button.edit", function () {
     { value: id },
     function (data, textStatus, jqXHR) {
       if ("cliente" in data) {
-        const { id, seriedoc, nombres, email, telefono, direccion } = data.cliente;
+        const { id, seriedoc, nombres, email, telefono, direccion } =
+          data.cliente;
         $("#id").val(id);
         $("#nombres").val(nombres);
         $("#email").val(email);
@@ -192,4 +193,9 @@ $(document).on("click", "button.estado", function () {
     },
     "json"
   );
+});
+
+// Cambiar el maximo para el seriedoc
+$("#iddoc").change(function () {
+  changeMaxDoc();
 });

@@ -11,6 +11,7 @@
 
   <link rel="stylesheet" href="<?= URL ?>public/css/app.min.css">
 
+  <link rel="stylesheet" href="<?= URL ?>public/bundles/select2/dist/css/select2.min.css">
   <link rel="stylesheet" href="<?= URL ?>public/bundles/izitoast/css/iziToast.min.css">
 
   <!-- Template CSS -->

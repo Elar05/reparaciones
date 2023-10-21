@@ -29,8 +29,9 @@
                     <th>Cliente</th>
                     <th>Modelo</th>
                     <th>Serie</th>
+                    <th>Marca</th>
                     <th>Tipo</th>
-                    <th>Descripción</th>
+                    <th>F. Registro</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -67,16 +68,20 @@
             </ul>
             <div class="tab-content tab-bordered" id="myTabContent2">
               <div class="tab-pane fade active show" id="tab_cliente" role="tabpanel" aria-labelledby="tab-cliente">
-                <?php require_once 'views/cliente/inputs.php'; ?>
+                <div class="row">
+                  <?php require_once 'views/cliente/inputs.php'; ?>
+                </div>
 
                 <div class="form-group text-right">
                   <button id="next" class="btn btn-primary">Siguiente <i class="fas fa-arrow-right"></i></button>
                 </div>
               </div>
               <div class="tab-pane fade" id="tab_equipo" role="tabpanel" aria-labelledby="tab-equipo">
-                <?php require_once 'views/equipo/inputs.php'; ?>
+                <div class="row">
+                  <?php require_once 'views/equipo/inputs.php'; ?>
+                </div>
 
-                <div class="form-group text-right">
+                <div class="form-group text-right group_tipo group_marca group_modelo">
                   <button type="submit" class="btn btn-primary">Registrar <i class="fas fa-check"></i></button>
                 </div>
               </div>
@@ -92,9 +97,8 @@
 
 <script src="<?= URL ?>public/bundles/datatables/datatables.min.js"></script>
 <script src="<?= URL ?>public/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js"></script>
+<script src="<?= URL ?>public/bundles/select2/dist/js/select2.full.min.js"></script>
 
-<script src="<?= URL ?>public/bundles/jquery-steps/jquery.steps.min.js"></script>
-
-<script src="<?= URL ?>public/js/equipo.js"></script>
+<script src="<?= URL ?>public/js/equipo.js" type="module"></script>
 
 <?php require_once 'views/layout/foot.php'; ?>
