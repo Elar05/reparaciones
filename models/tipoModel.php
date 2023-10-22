@@ -44,28 +44,15 @@ class TipoModel extends Model
     }
   }
 
-  public function update($nombre, $id)
+  public function update($column, $value, $id)
   {
     try {
-      $query = $this->prepare("UPDATE tipos SET nombre = :nombre WHERE id = :id;");
-      $query->bindParam(':nombre', $nombre, PDO::PARAM_STR);
-      $query->bindParam(':id', $id, PDO::PARAM_STR);
+      $query = $this->prepare("UPDATE tipos SET $column = :value WHERE id = :id;");
+      $query->bindParam(':value', $value, PDO::PARAM_STR);
+      $query->bindParam(':id', $id, PDO::PARAM_INT);
       return $query->execute();
     } catch (PDOException $e) {
       error_log('TipoModel::update() -> ' . $e->getMessage());
-      return false;
-    }
-  }
-
-  public function updateStatus($estado, $id)
-  {
-    try {
-      $query = $this->prepare("UPDATE tipos SET estado=:estado WHERE id=:id;");
-      $query->bindParam(':estado', $estado, PDO::PARAM_STR);
-      $query->bindParam(':id', $id, PDO::PARAM_STR);
-      return $query->execute();
-    } catch (PDOException $e) {
-      error_log("MarcaModel::update() -> " . $e->getMessage());
       return false;
     }
   }

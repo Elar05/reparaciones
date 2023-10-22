@@ -28,7 +28,9 @@
         </a>
         <ul class="dropdown-menu">
           <li><a class="nav-link" href="<?= URL ?>equipo">Listado</a></li>
-          <li><a class="nav-link" href="<?= URL ?>equipotipos">Tipos</a></li>
+          <li><a class="nav-link" href="<?= URL ?>tipo">Tipos</a></li>
+          <li><a class="nav-link" href="<?= URL ?>marca">Marcas</a></li>
+          <li><a class="nav-link" href="<?= URL ?>modelo">Modelos</a></li>
         </ul>
       </li>
       <li class="dropdown">

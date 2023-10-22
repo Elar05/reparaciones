@@ -23,10 +23,11 @@ class Marca extends Session
       foreach ($marcas as $marca) {
         $botones = "<button class='btn btn-warning edit' id='{$marca["id"]}'><i class='fas fa-pencil-alt'></i></button>";
         // $botones .= "<button class='ml-1 btn btn-danger delete' id='{$marca["id"]}'><i class='fas fa-times'></i></button>";
-        $class = ($marca["estado"] === "0") ? "success" : "danger";
-        $txt = ($marca["estado"] === "0") ? "Activo" : "Inactivo";
 
-        $estado = "<span class='badge badge-$class text-uppercase font-weight-bold cursor-pointer' id='{$marca["id"]}'>$txt</span>";
+        $class = ($marca["estado"] === "1") ? "success" : "danger";
+        $txt = ($marca["estado"] === "1") ? "Activo" : "Inactivo";
+
+        $estado = "<span class='badge badge-$class text-uppercase font-weight-bold cursor-pointer'>$txt</span>";
         $estado .= "<button class='ml-1 btn btn-info estado' data-id='{$marca["id"]}' data-estado='{$marca["estado"]}'><i class='fas fa-sync'></i></button>";
 
         $data[] = [
@@ -88,23 +89,10 @@ class Marca extends Session
       $this->response(["error" => "Marca ya registrada"]);
     }
 
-    if ($this->model->update($marca, $_POST['id'])) {
+    if ($this->model->update("nombre", $marca, $_POST['id'])) {
       $this->response(["success" => "marca actualizado"]);
     } else {
       $this->response(["error" => "Error al actualizar marca"]);
-    }
-  }
-
-  public function delete()
-  {
-    if (empty($_POST['id'])) {
-      $this->response(["error" => "Faltan parametros"]);
-    }
-
-    if ($this->model->delete($_POST['id'])) {
-      $this->response(["success" => "marca eliminado"]);
-    } else {
-      $this->response(["error" => "Error al eliminar marca"]);
     }
   }
 
@@ -116,7 +104,7 @@ class Marca extends Session
 
     $estado = ($_POST['estado'] == 0) ? 1 : 0;
 
-    if ($this->model->updateStatus($estado, $_POST['id'])) {
+    if ($this->model->update("estado", $estado, $_POST['id'])) {
       $this->response(["success" => "Estado actualizado"]);
     } else {
       $this->response(["error" => "Error al actualizar estado"]);

@@ -6,6 +6,6 @@
   color: var(--gray-color);
 }
 
-.error {
-  color: #fc544b !important;
+.theme-white .form-control {
+  border-color: #6777ef;
 }
