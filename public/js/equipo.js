@@ -145,15 +145,23 @@ $(document).on("click", "button.edit", function () {
       if ("equipo" in data) {
         $("#id").val(data.equipo.id);
 
+        $("#iddoc").val(data.equipo.iddoc).attr("disabled", "disabled");
         $("#seriedoc").val(data.equipo.seriedoc).attr("disabled", "disabled");
         $("#nombres").val(data.equipo.nombres).attr("disabled", "disabled");
         $("#email").val(data.equipo.email).attr("disabled", "disabled");
         $("#telefono").val(data.equipo.telefono).attr("disabled", "disabled");
         $("#direccion").val(data.equipo.direccion).attr("disabled", "disabled");
 
-        $("#tipo").val(data.equipo.idtipo);
-        $("#marca").val(data.equipo.idmarca);
-        $("#modelo").val(data.equipo.idmodelo);
+        $("#tipo").val(data.equipo.idtipo).trigger("change.select2");
+        $("#marca").val(data.equipo.idmarca).trigger("change.select2");
+        // Cargar el select de modelo
+        getDataSelect("modelo", "modelo/getAllByMarcaAndTipo", {
+          tipo: $("#tipo").val(),
+          marca: $("#marca").val(),
+        });
+        setTimeout(() => {
+          $("#modelo").val(data.equipo.idmodelo).trigger("change.select2");
+        }, 100);
         $("#n_serie").val(data.equipo.n_serie);
 
         $("#tab-cliente").removeClass("active");

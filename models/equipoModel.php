@@ -42,7 +42,6 @@ class EquipoModel extends Model
     try {
       $query = $this->prepare(
         "SELECT
-          e.id,
           e.n_serie,
           m.nombre AS modelo,
           t.nombre AS tipo,
@@ -50,7 +49,8 @@ class EquipoModel extends Model
           m.id AS idmodelo,
           m.idtipo,
           m.idmarca,
-          c.*
+          c.*,
+          e.id
         FROM equipos e
           INNER JOIN clientes c ON e.idcliente = c.id
           INNER JOIN modelos m ON e.idmodelo = m.id
@@ -92,6 +92,7 @@ class EquipoModel extends Model
 
       $sql = rtrim($sql, ', '); // elimina la última coma y el espacio
       $sql .= " WHERE id = $id;";
+      // error_log($sql);
       $query = $this->query($sql);
       return $query->execute();
     } catch (PDOException $e) {
