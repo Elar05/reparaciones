@@ -306,3 +306,7 @@ $("#save_new_modelo").click(function (e) {
     });
   }
 });
+
+$("#iddoc").change(function () {
+  changeMaxDoc();
+});

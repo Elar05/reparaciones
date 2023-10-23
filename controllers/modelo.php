@@ -21,14 +21,10 @@ class Modelo extends Session
         $botones = "<button class='btn btn-warning edit' id='{$modelo["id"]}'><i class='fas fa-pencil-alt'></i></button>";
         // $botones .= "<button class='ml-1 btn btn-danger delete' id='{$modelo["id"]}'><i class='fas fa-times'></i></button>";
 
-        $class = "success";
-        $txt = "Activo";
-        if ($modelo["estado"] === "0") {
-          $class = "danger";
-          $txt = "Inactivo";
-        }
-
-        $estado = "<span class='badge badge-$class text-uppercase font-weight-bold cursor-pointer' id='{$modelo["id"]}'>$txt</span>";
+        $status = explode("-", $modelo['status']);
+        $txt = $status[0];
+        $class = $status[1];
+        $estado = "<span class='badge badge-$class text-uppercase font-weight-bold cursor-pointer'>$txt</span>";
         $estado .= "<button class='ml-1 btn btn-info estado' data-id='{$modelo["id"]}' data-estado='{$modelo["estado"]}'><i class='fas fa-sync'></i></button>";
 
         $data[] = [
@@ -54,7 +50,7 @@ class Modelo extends Session
     $modelo = trim($_POST['nombre']);
 
     // Validar existencia
-    if ($this->model->get($modelo, 'nombre')) {
+    if ($this->model->get($modelo, 'nombre', $_POST['tipo'], $_POST['marca'])) {
       $this->response(["error" => "modelo ya registrada"]);
     }
 
@@ -95,7 +91,7 @@ class Modelo extends Session
     $modelo = trim($_POST['nombre']);
 
     // Validar existencia
-    if ($this->model->get($modelo, 'nombre')) {
+    if ($this->model->get($modelo, 'nombre', $_POST['tipo'], $_POST['marca'])) {
       $this->response(["error" => "modelo ya registrada"]);
     }
 

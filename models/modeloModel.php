@@ -7,11 +7,15 @@ class ModeloModel extends Model
     parent::__construct();
   }
 
-  public function get($id, $column = 'id')
+  public function get($value, $column = 'id', $idtipo = null, $idmarca = null)
   {
     try {
-      $query = $this->prepare("SELECT * FROM modelos WHERE $column = ?;");
-      $query->execute([$id]);
+      $sql = "";
+      if ($idtipo !== null && $idmarca !== null)
+        $sql = "AND idtipo = $idtipo AND idmarca = $idmarca";
+
+      $query = $this->prepare("SELECT * FROM modelos WHERE $column = :value $sql;");
+      $query->execute(['value' => $value]);
       return $query->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
       error_log("ModeloModel::get() -> " . $e->getMessage());
@@ -26,7 +30,9 @@ class ModeloModel extends Model
         "SELECT
           mo.*,
           t.nombre AS tipo,
-          ma.nombre AS marca
+          ma.nombre AS marca,
+          CASE WHEN mo.estado = 0 THEN 'Inacticvo-danger' 
+          ELSE 'Activo-success' END AS status
         FROM modelos mo
           INNER JOIN tipos t ON mo.idtipo = t.id
           INNER JOIN marcas ma ON mo.idmarca = ma.id;"
