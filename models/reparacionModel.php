@@ -7,17 +7,63 @@ class ReparacionModel extends Model
     parent::__construct();
   }
 
-  public function getAll($column = null, $value = null)
+  public function getAll($filtros)
   {
     try {
-      $sql = "";
-      if ($column !== null && $value !== null) $sql = " WHERE $column = '$value'";
-      $q = "SELECT r.*, u.nombres AS usuario, e.modelo, e.n_serie, e.idtipo_equipo, et.tipo, c.documento, c.nombres AS cliente, c.email, c.telefono FROM reparaciones r JOIN usuarios u ON r.idusuario = u.id JOIN equipos e ON r.idequipo = e.id JOIN equipo_tipos et ON e.idtipo_equipo = et.id JOIN clientes c ON e.idcliente = c.id$sql;";
-      $query = $this->query($q);
+      $limit = "LIMIT $filtros[length] OFFSET $filtros[start]";
+
+      $where = "";
+      // Filtro por usuario tecnico o por admin / secretaria
+      if ($filtros['column'] !== null && $filtros['value'] !== null) {
+        $where = "WHERE $filtros[column] = '$filtros[value]'";
+      }
+
+      // Filtro de la busqueda del datatable
+      if ($filtros['search'] !== null) {
+        $where = "WHERE r.costo LIKE '%$filtros[search]%' OR u.nombres LIKE '%$filtros[search]%' OR c.nombres LIKE '%$filtros[search]%' OR e.n_serie LIKE '%$filtros[search]%' OR m.nombre LIKE '%$filtros[search]%'";
+      }
+
+      // Filtro de fechas
+      if ($filtros['fechaInicio'] !== null && $filtros['fechaFin'] !== null) {
+        $fechaFin = date('Y-m-d', strtotime($filtros['fechaFin'] . ' + 1 day'));
+        $where = "WHERE r.f_inicio BETWEEN '$filtros[fechaInicio]' AND  '$fechaFin'";
+      }
+
+      $sql = "SELECT
+        r.*,
+        u.nombres AS usuario,
+        c.nombres AS cliente,
+        e.n_serie,
+        m.nombre AS modelo
+      FROM reparaciones r
+        INNER JOIN usuarios u ON r.idusuario = u.id
+        INNER JOIN equipos e ON r.idequipo = e.id
+        INNER JOIN clientes c ON e.idcliente = c.id
+        INNER JOIN modelos m ON e.idmodelo = m.id 
+      $where ORDER BY r.id DESC $limit;";
+
+      $query = $this->query($sql);
       $query->execute();
-      return $query->fetchAll(PDO::FETCH_ASSOC);
+      $reparaciones = $query->fetchAll(PDO::FETCH_ASSOC);
+
+      return [
+        "reparaciones" => $reparaciones,
+        "total" => $this->getTotal()
+      ];
     } catch (PDOException $e) {
       error_log("ReparacionModel::getAll() -> " . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function getTotal()
+  {
+    try {
+      $query = $this->query("SELECT COUNT(*) AS total FROM reparaciones;");
+      $query->execute();
+      return $query->fetch(PDO::FETCH_ASSOC)['total'];
+    } catch (PDOException $e) {
+      error_log('ReparacionModel::getTotal() -> ' . $e->getMessage());
       return false;
     }
   }

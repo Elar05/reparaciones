@@ -74,7 +74,7 @@
         <div class="modal-body">
           <form id="form_reparacion" method="POST" novalidate>
             <input type="hidden" class="input_hidden" name="id" id="id">
-            <input type="hidden" class="input_hidden clean_equipo" name="idequipo" id="idequipo">
+            <input type="hidden" class="input_hidden input_equipo" name="idequipo" id="idequipo">
             <input type="hidden" class="input_hidden" name="action" id="action" value="create">
 
             <ul class="nav nav-pills" id="myTab3" role="tablist">
@@ -90,7 +90,9 @@
             </ul>
             <div class="tab-content tab-bordered" id="myTabContent2">
               <div class="tab-pane fade active show" id="tab_cliente" role="tabpanel" aria-labelledby="tab-cliente">
-                <?php require_once 'views/cliente/inputs.php'; ?>
+                <div class="row">
+                  <?php require_once 'views/cliente/inputs.php'; ?>
+                </div>
 
                 <div class="form-group text-right">
                   <button id="next1" class="btn btn-primary">Siguiente <i class="fas fa-arrow-right"></i></button>
@@ -98,19 +100,21 @@
               </div>
 
               <div class="tab-pane fade" id="tab_equipo" role="tabpanel" aria-labelledby="tab-equipo">
-                <div class="form-group">
-                  <label for="equipo">Equipos del cliente</label>
-                  <div class="input-group">
-                    <select id="equipo" name="equipo" class="form-control clean_equipo">
-                      <option value="" selected disabled>__ Seleccione __</option>
-                    </select>
-                    <div class="input-group-append">
-                      <button class="btn btn-primary" id="clean_equipo"><i class="fas fa-times"></i></button>
+                <div class="row">
+                  <div class="col-12 form-group">
+                    <label for="equipo">Equipos del cliente</label>
+                    <div class="input-group">
+                      <select id="equipo" name="equipo" class="form-control input_equipo select2" style="width: 91%;">
+                        <option value="" selected disabled>__ Seleccione __</option>
+                      </select>
+                      <div class="input-group-append">
+                        <button class="btn btn-primary" id="clean_equipo"><i class="fas fa-times"></i></button>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                <?php require_once 'views/equipo/inputs.php'; ?>
+                  <?php require_once 'views/equipo/inputs.php'; ?>
+                </div>
 
                 <div class="form-group text-right">
                   <button id="next2" class="btn btn-primary">Siguiente <i class="fas fa-arrow-right"></i></button>
@@ -173,6 +177,7 @@
 <script src="<?= URL ?>public/bundles/datatables/export-tables/vfs_fonts.js"></script>
 <script src="<?= URL ?>public/bundles/datatables/export-tables/buttons.print.min.js"></script>
 <script src="<?= URL ?>public/bundles/bootstrap-daterangepicker/daterangepicker.js"></script>
+<script src="<?= URL ?>public/bundles/select2/dist/js/select2.full.min.js"></script>
 
 <!-- Page Specific JS File -->
 <script src="<?= URL ?>public/js/reparacion.js" type="module"></script>

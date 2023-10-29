@@ -2,31 +2,55 @@
 
 class Reparacion extends Session
 {
+  public $documentoModel;
+
   public function __construct($url)
   {
     parent::__construct($url);
+
+    require_once 'models/documentoModel.php';
+    $this->documentoModel = new DocumentoModel;
   }
 
   public function render()
   {
     $this->view->render("reparacion/index", [
       "usuarios" => $this->getUsuarios(),
-      "tipos" => $this->getTipos()
+      "tipos" => $this->getTipos(),
+      "documentos" => $this->documentoModel->getAll()
     ]);
   }
 
   public function list()
   {
+    $search = !empty($_POST['search']['value']) ? $_POST['search']['value'] : null;
+    $start = $_POST['start'] ?? 0;
+    $length = $_POST['length'] ?? 10;
+
+    $fechaInicio = $_POST['fechaInicio'] ?? null;
+    $fechaFin = $_POST['fechaFin'] ?? null;
+
     $column = null;
     $value = null;
-
     if ($this->userType === 3) {
       $column = "r.idusuario";
       $value = $this->userId;
     }
 
+    $filtros = [
+      "start" => $start,
+      "length" => $length,
+      "search" => $search,
+      "column" => $column,
+      "value" => $value,
+      "fechaInicio" => $fechaInicio,
+      "fechaFin" => $fechaFin,
+    ];
+
     $data = [];
-    $reparaciones = $this->model->getAll($column, $value);
+    $dataReparaciones = $this->model->getAll($filtros);
+
+    $reparaciones = $dataReparaciones['reparaciones'];
     if (count($reparaciones) > 0) {
       foreach ($reparaciones as $reparacion) {
         $botones = "<button class='btn btn-warning edit' id='{$reparacion["id"]}'><i class='fas fa-pencil-alt'></i></button>";
@@ -67,7 +91,12 @@ class Reparacion extends Session
       }
     }
 
-    $this->response(["data" => $data]);
+    $this->response([
+      "draw" => $_POST['draw'],
+      "recordsTotal" => $dataReparaciones['total'],
+      "recordsFiltered" => $dataReparaciones['total'],
+      "data" => $data
+    ]);
   }
 
   public function get()
@@ -87,25 +116,26 @@ class Reparacion extends Session
   public function create()
   {
     if (
-      empty($_POST['documento']) || empty($_POST['nombres']) ||
-      empty($_POST['email']) || empty($_POST['telefono']) ||
+      empty($_POST['iddoc']) || empty($_POST['seriedoc']) ||
+      empty($_POST['nombres']) || empty($_POST['telefono']) ||
       empty($_POST['modelo']) || empty($_POST['n_serie']) ||
-      empty($_POST['descripcion']) || empty($_POST['tipo']) ||
-      empty($_POST['detalle']) || empty($_POST['costo']) ||
-      empty($_POST['usuario'])
+      empty($_POST['marca']) || empty($_POST['tipo']) ||
+      empty($_POST['detalle']) || empty($_POST['costo']) || empty($_POST['usuario'])
     ) {
       $this->response(["error" => "Faltan parametros"]);
     }
 
     // Validar existencia del clietne
     $clienteModel = $this->clienteModel();
-    $cliente = $clienteModel->get($_POST['documento'], 'documento');
+    $cliente = $clienteModel->get($_POST['seriedoc'], 'seriedoc');
     if (empty($cliente)) {
       $idc = $clienteModel->save([
-        'documento' => $_POST['documento'],
+        'iddoc' => $_POST['iddoc'],
+        'seriedoc' => $_POST['seriedoc'],
         'nombres' => $_POST['nombres'],
         'email' => $_POST['email'],
         'telefono' => $_POST['telefono'],
+        'direccion' => $_POST['direccion'],
       ]);
     }
     $idcliente = $idc ?? $cliente['id'];
@@ -115,10 +145,8 @@ class Reparacion extends Session
     if (empty($_POST['idequipo'])) {
       $ide = $equipoModel->save([
         'idcliente' => $idcliente,
-        'modelo' => $_POST['modelo'],
+        'idmodelo' => $_POST['modelo'],
         'n_serie' => $_POST['n_serie'],
-        'descripcion' => $_POST['descripcion'],
-        'tipo' => $_POST['tipo'],
       ]);
     } else {
       $equipo = $equipoModel->get($_POST['idequipo']);
@@ -195,8 +223,8 @@ class Reparacion extends Session
   // obtener los tipos de equipos
   public function getTipos()
   {
-    require_once 'models/equipoTiposModel.php';
-    $tipos = new EquipoTiposModel();
+    require_once 'models/tipoModel.php';
+    $tipos = new TipoModel();
     return $tipos->getAll();
   }
 

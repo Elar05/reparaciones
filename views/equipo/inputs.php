@@ -1,7 +1,7 @@
 <div class="col-12 form-group group_marca">
   <label for="tipo">Tipo</label>
   <div class="input-group">
-    <select id="tipo" name="tipo" class="form-control select2 clean_equipo" style="width: 78%;" required>
+    <select id="tipo" name="tipo" class="form-control select2 input_equipo" style="width: 78%;" required>
       <option value="" selected disabled>__ Seleccione __</option>
     </select>
 
@@ -71,5 +71,5 @@
 
 <div class="col-12 form-group group_tipo group_marca group_modelo">
   <label for="n_serie">Serie</label>
-  <input type="text" id="n_serie" name="n_serie" class="form-control clean_equipo" pattern="[A-Za-z0-9 ]+" required>
+  <input type="text" id="n_serie" name="n_serie" class="form-control input_equipo" pattern="[A-Za-z0-9 ]+" required>
 </div>

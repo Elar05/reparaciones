@@ -1,41 +1,28 @@
+import {
+  changeMaxDoc,
+  getCliente,
+  getDataSelect,
+  saveTipoOrMarcaOrModelo,
+} from "./exports.js";
+
 // Load table
-function loadTable() {
-  let table = $("#table_reparacion").DataTable({
+function loadTable(data = {}) {
+  $("#table_reparacion").DataTable({
     destroy: true,
+    processing: true,
+    serverSide: true,
     ajax: {
       type: "post",
       url: "reparacion/list",
-      data: {},
+      data,
     },
-    order: [[0, "desc"]],
     dom: "Bfrtip",
     buttons: ["copy", "csv", "excel", "pdf", "print"],
+    ordering: false,
   });
-
-  let filtroActivo = false;
-
-  $("#filtrarBtn").click(function (e) {
-    e.preventDefault();
-    cleanFiltro();
-
-    let fechaInicio = $("#f_inicio").val();
-    let fechaFin = $("#f_fin").val();
-
-    if (fechaInicio != "" && fechaFin != "") {
-      filtrar(fechaInicio, fechaFin);
-    } else {
-      iziToast.info({
-        title: "Ingrese un rango de fechas a filtrar",
-        message: "",
-        position: "topCenter",
-        displayMode: 1,
-      });
-    }
-  });
-  $("#clean_filtro").click(function (e) {
-    e.preventDefault();
-    cleanFiltro();
-  });
+}
+$(document).ready(function () {
+  loadTable();
 
   $("#fechas").daterangepicker({
     locale: {
@@ -47,46 +34,38 @@ function loadTable() {
     opens: "right",
   });
 
-  $("#fechas").on("apply.daterangepicker", function (ev, picker) {
-    cleanFiltro();
-    let fechaInicio = picker.startDate.format("YYYY-MM-DD");
-    let fechaFin = picker.endDate.format("YYYY-MM-DD");
-    filtrar(fechaInicio, fechaFin);
-  });
-  $("#fechas").on("cancel.daterangepicker", function (ev, picker) {
-    cleanFiltro();
-  });
+  $(".select2").select2({ dropdownParent: $(".modal") });
+  getDataSelect("tipo", "tipo/list", { data: 1 });
+  getDataSelect("marca", "marca/list", { data: 1 });
+});
 
-  function filtrar(fechaInicio, fechaFin) {
-    // Aplicar filtro al datatable
-    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
-      let fechaRegistro = formatFecha(data[5]);
+$("#filtrarBtn").click(function () {
+  let fechaInicio = $("#f_inicio").val();
+  let fechaFin = $("#f_fin").val();
 
-      if (fechaRegistro >= fechaInicio && fechaRegistro <= fechaFin) {
-        return true;
-      }
-      return false;
+  if (fechaInicio != "" && fechaFin != "") {
+    loadTable({ fechaInicio, fechaFin });
+  } else {
+    iziToast.info({
+      title: "Ingrese un rango de fechas a filtrar",
+      message: "",
+      position: "topCenter",
+      displayMode: 1,
     });
-    table.draw();
-    filtroActivo = true;
   }
-  function cleanFiltro() {
-    if (filtroActivo) {
-      $.fn.dataTable.ext.search.pop();
-      table.draw();
-      filtroActivo = false;
-    }
-  }
-}
-$(document).ready(function () {
+});
+$("#clean_filtro").click(function (e) {
   loadTable();
 });
 
-function formatFecha(fecha) {
-  // Función para formatear la fecha "y-m-d h:i:s" a "y-m-d"
-  let date = fecha.split(" ");
-  return date[0];
-}
+$("#fechas").on("apply.daterangepicker", function (ev, picker) {
+  let fechaInicio = picker.startDate.format("YYYY-MM-DD");
+  let fechaFin = picker.endDate.format("YYYY-MM-DD");
+  loadTable({ fechaInicio, fechaFin });
+});
+$("#fechas").on("cancel.daterangepicker", function (ev, picker) {
+  loadTable();
+});
 
 // Establecer la acción => create
 $("#add_reparacion").click(function (e) {
@@ -94,14 +73,8 @@ $("#add_reparacion").click(function (e) {
   $("#action").val("create");
   $("#form_reparacion")[0].reset();
 
-  $(".clean_equipo").val("");
-  $(".clean_equipo").removeAttr("disabled");
-  $(".inputs_disabled").removeAttr("disabled");
-
-  $("#equipo").empty();
-  $("#equipo").append(
-    "<option value='' selected disabled>__ Seleccione __</option>"
-  );
+  // Limpiar select de equipos de cliente, si es que hay
+  getDataSelect("equipo");
 
   $("#tab-cliente").addClass("active").removeClass("disabled");
   $("#tab-equipo").removeClass("active").addClass("disabled");
@@ -111,6 +84,13 @@ $("#add_reparacion").click(function (e) {
   $("#tab_equipo").removeClass("active show");
   $("#tab_reparacion").removeClass("active show");
 
+  $(".input_cliente").removeAttr("disabled");
+  $(".input_equipo").removeAttr("disabled");
+
+  $("#tipo").val("").trigger("change.select2");
+  $("#marca").val("").trigger("change.select2");
+  getDataSelect("modelo");
+
   $("#form_reparacion").removeClass("was-validated");
 });
 
@@ -118,9 +98,8 @@ $("#add_reparacion").click(function (e) {
 $("#next1").click(function (e) {
   e.preventDefault();
   if (
-    $("#documento").val() === "" ||
+    $("#seriedoc").val() === "" ||
     $("#nombres").val() === "" ||
-    $("#email").val() === "" ||
     $("#telefono").val() === ""
   ) {
     $("#form_reparacion").addClass("was-validated");
@@ -143,16 +122,22 @@ $("#next1").click(function (e) {
 
   $("#form_reparacion").removeClass("was-validated");
 
+  getDataSelect("equipo");
+
+  $(".input_equipo").val("");
+  $("#tipo").val("").trigger("change.select2");
+  $("#marca").val("").trigger("change.select2");
+  getDataSelect("modelo");
   $.post(
     "equipo/getEquiposByCliente",
     {
-      documento: $("#documento").val(),
+      seriedoc: $("#seriedoc").val(),
     },
     function (data, textStatus, jqXHR) {
       if ("equipos" in data && data.equipos.length > 0) {
         data.equipos.forEach((equipo) => {
           $("#equipo").append(
-            `<option value="${equipo.id}" tipo="${equipo.idtipo_equipo}" modelo="${equipo.modelo}" n_serie="${equipo.n_serie}" descripcion="${equipo.descripcion}">${equipo.tipo} - ${equipo.modelo} - ${equipo.n_serie}</option>`
+            `<option value="${equipo.id}" tipo="${equipo.idtipo}" modelo="${equipo.idmodelo}" marca="${equipo.idmarca}" n_serie="${equipo.n_serie}">${equipo.modelo} - ${equipo.n_serie} - ${equipo.tipo} - ${equipo.marca}</option>`
           );
         });
       }
@@ -167,7 +152,7 @@ $("#next2").click(function (e) {
   if (
     $("#tipo").val() === "" ||
     $("#n_serio").val() === "" ||
-    $("#descripcion").val() === "" ||
+    $("#marca").val() === "" ||
     $("#modelo").val() === ""
   ) {
     $("#form_reparacion").addClass("was-validated");
@@ -194,38 +179,58 @@ $("#next2").click(function (e) {
 // Buscar cliente
 $("#search_cliente").click(function (e) {
   e.preventDefault();
-  $.post(
-    "cliente/get",
-    { value: $("#documento").val(), column: "documento" },
-    function (data, textStatus, jqXHR) {
-      if ("error" in data) {
-        iziToast.error({
-          title: "Error, ",
-          message: data.error,
-          position: "topCenter",
-          displayMode: 1,
-        });
-        $("#nombres").val("");
-        $("#email").val("");
-        $("#telefono").val("");
-      } else {
-        $("#nombres").val(data.cliente.nombres);
-        $("#email").val(data.cliente.email);
-        $("#telefono").val(data.cliente.telefono);
-      }
-    },
-    "json"
-  );
+  getCliente({ value: $("#seriedoc").val(), column: "seriedoc" }, (data) => {
+    if ("error" in data) {
+      iziToast.error({
+        title: "Error, ",
+        message: data.error,
+        position: "topCenter",
+        displayMode: 1,
+      });
+      $("#nombres").val("");
+      $("#email").val("");
+      $("#telefono").val("");
+      $("#direccion").val("");
+    } else {
+      $("#nombres").val(data.cliente.nombres);
+      $("#email").val(data.cliente.email);
+      $("#telefono").val(data.cliente.telefono);
+      $("#direccion").val(data.cliente.direccion);
+    }
+  });
+});
+
+// Traer las modelos por marca y tipo
+$("#tipo, #marca").change(function () {
+  getDataSelect("modelo", "modelo/getAllByMarcaAndTipo", {
+    tipo: $("#tipo").val(),
+    marca: $("#marca").val(),
+  });
 });
 
 // Rellenar el form de equpo si el cliente ya tiene registrados
 $("#equipo").change(function (e) {
   e.preventDefault();
   $("#idequipo").val($("#equipo option:selected").val());
-  $("#tipo").val($("#equipo option:selected").attr("tipo"));
-  $("#modelo").val($("#equipo option:selected").attr("modelo"));
+  $("#tipo")
+    .val($("#equipo option:selected").attr("tipo"))
+    .trigger("change.select2");
+  $("#marca")
+    .val($("#equipo option:selected").attr("marca"))
+    .trigger("change.select2");
+
+  getDataSelect("modelo", "modelo/getAllByMarcaAndTipo", {
+    tipo: $("#tipo").val(),
+    marca: $("#marca").val(),
+  });
+
+  setTimeout(() => {
+    $("#modelo")
+      .val($("#equipo option:selected").attr("modelo"))
+      .trigger("change.select2");
+  }, 100);
+
   $("#n_serie").val($("#equipo option:selected").attr("n_serie"));
-  $("#descripcion").val($("#equipo option:selected").attr("descripcion"));
 });
 
 // Limipiar el form de equipo
