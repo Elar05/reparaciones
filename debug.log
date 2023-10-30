@@ -1,1 +1,0 @@
-[29-Oct-2023 18:33:19 America/Lima] ReparacionModel::get() -> SQLSTATE[42S02]: Base table or view not found: 1146 Table 'reparaciones.equipo_tipos' doesn't exist

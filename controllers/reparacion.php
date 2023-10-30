@@ -53,8 +53,15 @@ class Reparacion extends Session
     $reparaciones = $dataReparaciones['reparaciones'];
     if (count($reparaciones) > 0) {
       foreach ($reparaciones as $reparacion) {
-        $botones = "<button class='btn btn-warning edit' id='{$reparacion["id"]}'><i class='fas fa-pencil-alt'></i></button>";
-        $botones .= "<button class='btn btn-danger delete' id='{$reparacion["id"]}'><i class='fas fa-times'></i></button>";
+        $botones = "<div class='btn-group dropleft'>
+          <button type='button' class='btn btn-success dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
+            <i class='fas fa-cog'></i>
+          </button>
+          <div class='dropdown-menu dropleft'>
+            <button class='dropdown-item edit' id='{$reparacion["id"]}'><i class='fas fa-pencil-alt text-warning'></i> Editar</button>
+            <button class='dropdown-item delete' id='{$reparacion["id"]}'><i class='fas fa-times text-danger'></i> Eliminar</button>
+          </div>
+        </div>";
 
         $arrEstado = [
           "0" => ["class" => "info", "text" => "En espera"],
@@ -65,15 +72,12 @@ class Reparacion extends Session
         $class = $arrEstado[$estado]["class"];
         $txt = $arrEstado[$estado]["text"];
 
-        $estado = "<span class='badge badge-$class text-uppercase mr-2'>$txt</span>";
-        $estado .= "<div class='btn-group dropleft'>
-          <button type='button' class='btn btn-primary dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-            <i class='fas fa-cogs'></i>
-          </button>
+        $estado = "<div class='btn-group dropleft'>
+          <button type='button' class='btn btn-$class dropdown-toggle font-14' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>$txt</button>
           <div class='dropdown-menu dropleft'>
             <button class='dropdown-item estado' id='{$reparacion["id"]}' estado='0'><i class='fas fa-pause text-info'></i> En espera</button>
             <button class='dropdown-item estado' id='{$reparacion["id"]}' estado='1'><i class='fas fa-spinner text-warning'></i> En proceso</button>
-            <button class='dropdown-item estado' id='{$reparacion["id"]}' estado='2'><i class='fas fa-check text-success'></i> Terminado</button>
+            <button class='dropdown-item terminar' id='{$reparacion["id"]}' estado='2'><i class='fas fa-check text-success'></i> Terminado</button>
           </div>
         </div>";
 

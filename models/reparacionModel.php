@@ -71,7 +71,28 @@ class ReparacionModel extends Model
   public function get($id, $column = "id")
   {
     try {
-      $query = $this->prepare("SELECT r.*, u.nombres AS usuario, e.modelo, e.n_serie, e.idtipo_equipo, et.tipo, c.documento, c.nombres AS cliente, c.email, c.telefono FROM reparaciones r JOIN usuarios u ON r.idusuario = u.id JOIN equipos e ON r.idequipo = e.id JOIN equipo_tipos et ON e.idtipo_equipo = et.id JOIN clientes c ON e.idcliente = c.id WHERE r.$column = ?;");
+      $query = $this->prepare(
+        "SELECT
+          r.*,
+          u.nombres AS usuario,
+          m.id AS modelo,
+          m.idtipo AS tipo,
+          m.idmarca AS marca,
+          e.idcliente,
+          e.n_serie,
+          c.iddoc,
+          c.seriedoc,
+          c.nombres,
+          c.email,
+          c.telefono,
+          c.direccion
+        FROM reparaciones r
+          INNER JOIN usuarios u ON r.idusuario = u.id
+          INNER JOIN equipos e ON r.idequipo = e.id
+          INNER JOIN clientes c ON e.idcliente = c.id
+          INNER JOIN modelos m ON e.idmodelo = m.id
+        WHERE r.$column = ?;"
+      );
       $query->execute([$id]);
       return $query->fetch(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {

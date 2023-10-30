@@ -236,13 +236,11 @@ $("#equipo").change(function (e) {
 // Limipiar el form de equipo
 $("#clean_equipo").click(function (e) {
   e.preventDefault();
-  // $("#idequipo").val("");
-  // $("#equipo").val("");
-  // $("#tipo").val("");
-  // $("#modelo").val("");
-  // $("#n_serie").val("");
-  // $("#descripcion").val("");
-  $(".clean_equipo").val("");
+  $(".input_equipo").val("");
+  $("#equipo").val("").trigger("change.select2");
+  $("#tipo").val("").trigger("change.select2");
+  $("#marca").val("").trigger("change.select2");
+  getDataSelect("modelo");
 });
 
 // Enviar form
@@ -287,13 +285,8 @@ $("#form_reparacion").submit(function (e) {
 $(document).on("click", "button.edit", function () {
   $("#form_reparacion")[0].reset();
   $(".input_hidden").val("");
-
-  $("#equipo").empty();
-  $("#equipo").append(
-    "<option value='' selected disabled>__ Seleccione __</option>"
-  );
+  getDataSelect("equipo");
   $("#modal_reparacion").modal("toggle");
-
   $("#action").val("edit");
   let id = $(this).attr("id");
   $.post(
@@ -301,28 +294,33 @@ $(document).on("click", "button.edit", function () {
     { id },
     function (data, textStatus, jqXHR) {
       if ("reparacion" in data) {
+        // Datos de la reparacion
         $("#id").val(data.reparacion.id);
         $("#detalle").val(data.reparacion.detalle);
         $("#costo").val(data.reparacion.costo);
         $("#usuario").val(data.reparacion.idusuario);
 
-        $("#documento")
-          .val(data.reparacion.documento)
-          .attr("disabled", "disabled");
-        $("#nombres").val(data.reparacion.nombres).attr("disabled", "disabled");
-        $("#email").val(data.reparacion.email).attr("disabled", "disabled");
-        $("#telefono")
-          .val(data.reparacion.telefono)
-          .attr("disabled", "disabled");
+        // Datos del cliente
+        $("#iddoc").val(data.reparacion.iddoc);
+        $("#seriedoc").val(data.reparacion.seriedoc);
+        $("#nombres").val(data.reparacion.nombres);
+        $("#email").val(data.reparacion.email);
+        $("#telefono").val(data.reparacion.telefono);
+        $("#direccion").val(data.reparacion.direccion);
+        $(".input_cliente").attr("disabled", true);
 
-        $("#tipo")
-          .val(data.reparacion.idtipo_equipo)
-          .attr("disabled", "disabled");
-        $("#modelo").val(data.reparacion.modelo).attr("disabled", "disabled");
-        $("#n_serie").val(data.reparacion.n_serie).attr("disabled", "disabled");
-        $("#descripcion")
-          .val(data.reparacion.descripcion)
-          .attr("disabled", "disabled");
+        // Datos del equipo del cliente
+        $("#tipo").val(data.reparacion.tipo).trigger("change.select2");
+        $("#marca").val(data.reparacion.marca).trigger("change.select2");
+        getDataSelect("modelo", "modelo/getAllByMarcaAndTipo", {
+          tipo: data.reparacion.tipo,
+          marca: data.reparacion.marca,
+        });
+        setTimeout(() => {
+          $("#modelo").val(data.reparacion.modelo).trigger("change.select2");
+        }, 100);
+        $("#n_serie").val(data.reparacion.n_serie);
+        $(".input_equipo").attr("disabled", true);
 
         $("#tab-cliente").removeClass("active disabled");
         $("#tab-equipo").removeClass("active disabled");
