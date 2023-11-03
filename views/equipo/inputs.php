@@ -8,6 +8,10 @@
     <div class="input-group-append">
       <button type="button" class="btn btn-success shadow-none group_tipo group_modelo cancel_add_tipo" id="add_tipo"><i class="fas fa-plus"></i> Agregar</button>
     </div>
+
+    <div class="invalid-feedback">
+      Tipo es requerido.
+    </div>
   </div>
 </div>
 <div class="col-12 form-group group_tipo d-none" id="input_new_tipo">
@@ -30,6 +34,9 @@
     </select>
     <div class="input-group-append">
       <button type="button" class="btn btn-success shadow-none group_marca group_modelo cancel_add_marca" id="add_marca"><i class="fas fa-plus"></i> Agregar</button>
+    </div>
+    <div class="invalid-feedback">
+      Marca es requerido.
     </div>
   </div>
 </div>
@@ -54,6 +61,10 @@
 
     <div class="input-group-append">
       <button type="button" class="btn btn-success shadow-none cancel_add_modelo" id="add_modelo"><i class="fas fa-plus"></i> Agregar</button>
+    </div>
+
+    <div class="invalid-feedback">
+      Modelo es requerido.
     </div>
   </div>
 </div>

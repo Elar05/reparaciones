@@ -34,7 +34,8 @@ $(document).ready(function () {
     opens: "right",
   });
 
-  $(".select2").select2({ dropdownParent: $(".modal") });
+  // $(".select2").select2({ dropdownParent: $(".modal") });
+  $(".select2").select2();
   getDataSelect("tipo", "tipo/list", { data: 1 });
   getDataSelect("marca", "marca/list", { data: 1 });
 });
@@ -72,17 +73,10 @@ $("#add_reparacion").click(function (e) {
   e.preventDefault();
   $("#action").val("create");
   $("#form_reparacion")[0].reset();
+  $(".input_hidden").val("");
 
   // Limpiar select de equipos de cliente, si es que hay
   getDataSelect("equipo");
-
-  $("#tab-cliente").addClass("active").removeClass("disabled");
-  $("#tab-equipo").removeClass("active").addClass("disabled");
-  $("#tab-reparacion").removeClass("active").addClass("disabled");
-
-  $("#tab_cliente").addClass("active show");
-  $("#tab_equipo").removeClass("active show");
-  $("#tab_reparacion").removeClass("active show");
 
   $(".input_cliente").removeAttr("disabled");
   $(".input_equipo").removeAttr("disabled");
@@ -91,89 +85,13 @@ $("#add_reparacion").click(function (e) {
   $("#marca").val("").trigger("change.select2");
   getDataSelect("modelo");
 
+  $("#card_reparacion").addClass("show");
+
   $("#form_reparacion").removeClass("was-validated");
 });
-
-// Validar antes de pasar al siguiente tab => equipo
-$("#next1").click(function (e) {
+$("#cancel_reparacion").click(function (e) {
   e.preventDefault();
-  if (
-    $("#seriedoc").val() === "" ||
-    $("#nombres").val() === "" ||
-    $("#telefono").val() === ""
-  ) {
-    $("#form_reparacion").addClass("was-validated");
-    iziToast.warning({
-      title: "",
-      message: "Completa el formulario",
-      position: "topCenter",
-      displayMode: 1,
-    });
-    return;
-  }
-
-  $("#tab-cliente").removeClass("active");
-  $("#tab-equipo").addClass("active").removeClass("disabled");
-  $("#tab-reparacion").removeClass("active").addClass("disabled");
-
-  $("#tab_cliente").removeClass("active show");
-  $("#tab_equipo").addClass("active show");
-  $("#tab_reparacion").removeClass("active show");
-
-  $("#form_reparacion").removeClass("was-validated");
-
-  getDataSelect("equipo");
-
-  $(".input_equipo").val("");
-  $("#tipo").val("").trigger("change.select2");
-  $("#marca").val("").trigger("change.select2");
-  getDataSelect("modelo");
-  $.post(
-    "equipo/getEquiposByCliente",
-    {
-      seriedoc: $("#seriedoc").val(),
-    },
-    function (data, textStatus, jqXHR) {
-      if ("equipos" in data && data.equipos.length > 0) {
-        data.equipos.forEach((equipo) => {
-          $("#equipo").append(
-            `<option value="${equipo.id}" tipo="${equipo.idtipo}" modelo="${equipo.idmodelo}" marca="${equipo.idmarca}" n_serie="${equipo.n_serie}">${equipo.modelo} - ${equipo.n_serie} - ${equipo.tipo} - ${equipo.marca}</option>`
-          );
-        });
-      }
-    },
-    "json"
-  );
-});
-
-// Validar antes de pasar al siguiente tab => reparacion
-$("#next2").click(function (e) {
-  e.preventDefault();
-  if (
-    $("#tipo").val() === "" ||
-    $("#n_serio").val() === "" ||
-    $("#marca").val() === "" ||
-    $("#modelo").val() === ""
-  ) {
-    $("#form_reparacion").addClass("was-validated");
-    iziToast.warning({
-      title: "",
-      message: "Completa el formulario",
-      position: "topCenter",
-      displayMode: 1,
-    });
-    return;
-  }
-
-  $("#tab-cliente").removeClass("active");
-  $("#tab-equipo").removeClass("active");
-  $("#tab-reparacion").addClass("active").removeClass("disabled");
-
-  $("#tab_cliente").removeClass("active show");
-  $("#tab_equipo").removeClass("active show");
-  $("#tab_reparacion").addClass("active show");
-
-  $("#form_reparacion").removeClass("was-validated");
+  $("#card_reparacion").removeClass("show");
 });
 
 // Buscar cliente
@@ -198,6 +116,23 @@ $("#search_cliente").click(function (e) {
       $("#direccion").val(data.cliente.direccion);
     }
   });
+
+  $.post(
+    "equipo/getEquiposByCliente",
+    {
+      seriedoc: $("#seriedoc").val(),
+    },
+    function (data, textStatus, jqXHR) {
+      if ("equipos" in data && data.equipos.length > 0) {
+        data.equipos.forEach((equipo) => {
+          $("#equipo").append(
+            `<option value="${equipo.id}" tipo="${equipo.idtipo}" modelo="${equipo.idmodelo}" marca="${equipo.idmarca}" n_serie="${equipo.n_serie}">${equipo.modelo} - ${equipo.n_serie} - ${equipo.tipo} - ${equipo.marca}</option>`
+          );
+        });
+      }
+    },
+    "json"
+  );
 });
 
 // Traer las modelos por marca y tipo
@@ -409,4 +344,64 @@ $(document).on("click", "button.estado", function () {
     },
     "json"
   );
+});
+
+// Cancel
+$(".cancel_add_tipo").click(function (e) {
+  e.preventDefault();
+  $(".group_tipo").toggleClass("d-none");
+  $("#new_tipo").val("");
+});
+$(".cancel_add_marca").click(function (e) {
+  e.preventDefault();
+  $(".group_marca").toggleClass("d-none");
+  $("#new_marca").val("");
+});
+$(".cancel_add_modelo").click(function (e) {
+  e.preventDefault();
+  $(".group_modelo").toggleClass("d-none");
+  $("#new_tipo").val("");
+});
+
+// Guardar nuevo tipo
+$("#save_new_tipo").click(function (e) {
+  e.preventDefault();
+  $(".group_tipo").toggleClass("d-none");
+
+  saveTipoOrMarcaOrModelo("tipo/create", { nombre: $("#new_tipo").val() });
+  getDataSelect("tipo", "tipo/list", { data: 1 });
+});
+// Guardar nuevo marca
+$("#save_new_marca").click(function (e) {
+  e.preventDefault();
+  $(".group_marca").toggleClass("d-none");
+
+  saveTipoOrMarcaOrModelo("marca/create", { nombre: $("#new_marca").val() });
+
+  getDataSelect("marca", "marca/list", { data: 1 });
+  getDataSelect("modelo");
+});
+// Guardar nuevo modelo
+$("#save_new_modelo").click(function (e) {
+  e.preventDefault();
+  $(".group_modelo").toggleClass("d-none");
+
+  saveTipoOrMarcaOrModelo("modelo/create", {
+    tipo: $("#tipo").val(),
+    marca: $("#marca").val(),
+    nombre: $("#new_modelo").val(),
+  });
+
+  getDataSelect("modelo", "modelo/getAllByMarcaAndTipo", {
+    tipo: $("#tipo").val(),
+    marca: $("#marca").val(),
+  });
+});
+
+// Agregar detalle a la reparacion
+$(document).on("click", "button.terminar", function () {
+  let id = $(this).attr("id"),
+    estado = $(this).attr("estado");
+
+  $("#modal_detalle").modal("toggle");
 });
