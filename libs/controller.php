@@ -39,6 +39,36 @@ class Controller
     exit();
   }
 
+  public function existPOST($params)
+  {
+    foreach ($params as $param) {
+      if (!isset($_POST[$param])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public function existGET($params)
+  {
+    foreach ($params as $param) {
+      if (!isset($_GET[$param])) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public function getGet($name)
+  {
+    return $_GET[$name];
+  }
+
+  public function getPost($name)
+  {
+    return $_POST[$name];
+  }
+
   public function response($data)
   {
     echo json_encode($data);
