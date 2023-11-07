@@ -51,6 +51,11 @@
             <i data-feather="grid"></i><span>Unidades</span>
           </a>
         </li>
+        <li class="dropdown">
+          <a href="<?= URL ?>producto" class="nav-link" data-toggle="tooltip" data-placement="right" data-original-title="Productos">
+            <i data-feather="grid"></i><span>Productos</span>
+          </a>
+        </li>
       <?php endif; ?>
     </ul>
   </aside>
