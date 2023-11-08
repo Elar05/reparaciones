@@ -150,6 +150,7 @@ $(document).on("click", "button.estado", function () {
 $(document).on("click", "button.img", function () {
   let foto = $(this).attr("foto");
   console.log(foto);
+  $("#modal_img").empty();
   $("#body_img").append(`<img src="${foto}" class='img-fluid'>`);
   $("#modal_img").modal("toggle");
 });
