@@ -14,12 +14,12 @@ function loadTable() {
 
 $(document).ready(function () {
   loadTable();
-  $(".select2").select2({ dropdownParent: $(".modal") });
+  $(".select2").select2();
   $(".select2").css("width", "74%");
   getDataSelect("tipo", "tipo/list", { data: 1 });
   getDataSelect("marca", "marca/list", { data: 1 });
   getDataSelect("unidad", "unidad/list", { data: 1 });
-  $("#unidad").select2({ dropdownParent: $(".modal") });
+  $("#unidad").select2();
 });
 
 // Establecer la acción al agregar producto -> create
@@ -28,6 +28,9 @@ $("#add_producto").click(function () {
   $("#action").val("create");
   $("#id").val("");
   $("#form_producto").removeClass("was-validated");
+  $("#card_producto").addClass("show");
+  $(".select2").val("").trigger("change.select2");
+  $("#unidad").val("").trigger("change.select2");
 });
 
 // Form producto => create / update
@@ -56,7 +59,7 @@ $("#form_producto").submit(function (e) {
           });
           loadTable();
           form[0].reset();
-          $("#modal_producto").modal("toggle");
+          $("#card_producto").removeClass("show");
         } else {
           iziToast.error({
             title: "Error, ",
@@ -76,7 +79,7 @@ $("#form_producto").submit(function (e) {
 $(document).on("click", "button.edit", function () {
   $("#form_producto")[0].reset();
   $("#action").val("edit");
-  $("#modal_producto").modal("toggle");
+  $("#card_producto").addClass("show");
   let id = $(this).attr("id");
   $.post(
     `producto/get`,
@@ -146,11 +149,11 @@ $(document).on("click", "button.estado", function () {
   );
 });
 
-// Cambiar estado
+// Mostrar imagenen
 $(document).on("click", "button.img", function () {
   let foto = $(this).attr("foto");
   console.log(foto);
-  $("#modal_img").empty();
+  $("#body_img").empty();
   $("#body_img").append(`<img src="${foto}" class='img-fluid'>`);
   $("#modal_img").modal("toggle");
 });
