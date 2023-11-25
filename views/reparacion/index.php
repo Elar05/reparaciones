@@ -77,7 +77,22 @@
                       </div>
 
                       <div class="form-group">
-                        <label for="costo">Costo</label>
+                        <label for="servicio">Tipo de Servicio</label>
+                        <select id="servicio" name="servicio" class="form-control" required>
+                          <option value="" selected disabled>__ Seleccione __</option>
+                          <?php
+                          foreach ($this->d['servicios'] as $servicio) {
+                            echo "<option value='{$servicio['id']}' precio='{$servicio['precio']}'>{$servicio['nombre']}</option>";
+                          }
+                          ?>
+                        </select>
+                        <div class="invalid-feedback">
+                          Seleccione un Tipo de Servicio
+                        </div>
+                      </div>
+
+                      <div class="form-group">
+                        <label for="costo">Costo referencial</label>
                         <input type="text" id="costo" name="costo" class="form-control" pattern="[0-9.]+" required>
                         <div class="invalid-feedback">
                           Costo es requerido. Solo digitos

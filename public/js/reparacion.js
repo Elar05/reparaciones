@@ -71,9 +71,9 @@ $("#fechas").on("cancel.daterangepicker", function (ev, picker) {
 // Establecer la acción => create
 $("#add_reparacion").click(function (e) {
   e.preventDefault();
-  $("#action").val("create");
-  $("#form_reparacion")[0].reset();
   $(".input_hidden").val("");
+  $("#form_reparacion")[0].reset();
+  $("#action").val("create");
 
   // Limpiar select de equipos de cliente, si es que hay
   getDataSelect("equipo");
@@ -186,7 +186,7 @@ $("#form_reparacion").submit(function (e) {
   if (form[0].checkValidity()) {
     let data = form.serialize();
     let url = $("#action").val();
-
+    console.log(url);
     $.post(
       `reparacion/${url}`,
       data,
@@ -199,7 +199,7 @@ $("#form_reparacion").submit(function (e) {
             displayMode: 1,
           });
           loadTable();
-          $("#modal_reparacion").modal("toggle");
+          $("#card_reparacion").removeClass("show");
         } else {
           iziToast.error({
             title: "Error, ",
@@ -221,7 +221,7 @@ $(document).on("click", "button.edit", function () {
   $("#form_reparacion")[0].reset();
   $(".input_hidden").val("");
   getDataSelect("equipo");
-  $("#modal_reparacion").modal("toggle");
+  $("#card_reparacion").addClass("show");
   $("#action").val("edit");
   let id = $(this).attr("id");
   $.post(
@@ -396,6 +396,11 @@ $("#save_new_modelo").click(function (e) {
     tipo: $("#tipo").val(),
     marca: $("#marca").val(),
   });
+});
+
+// Especificar el costo de la reparación con el precio del servicio
+$("#servicio").change(function () {
+  $("#costo").val($("option:selected", this).attr("precio"));
 });
 
 // Agregar detalle a la reparacion

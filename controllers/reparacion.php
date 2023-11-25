@@ -2,22 +2,24 @@
 
 class Reparacion extends Session
 {
-  public $documentoModel;
-
   public function __construct($url)
   {
     parent::__construct($url);
-
-    require_once 'models/documentoModel.php';
-    $this->documentoModel = new DocumentoModel;
   }
 
   public function render()
   {
+    require_once 'models/documentoModel.php';
+    require_once 'models/servicioModel.php';
+
+    $documentos = new DocumentoModel();
+    $servicios = new ServicioModel();
+
     $this->view->render("reparacion/index", [
       "usuarios" => $this->getUsuarios(),
       "tipos" => $this->getTipos(),
-      "documentos" => $this->documentoModel->getAll()
+      "documentos" => $documentos->getAll(),
+      "servicios" => $servicios->getAll()
     ]);
   }
 
@@ -119,13 +121,9 @@ class Reparacion extends Session
 
   public function create()
   {
-    if (
-      empty($_POST['iddoc']) || empty($_POST['seriedoc']) ||
-      empty($_POST['nombres']) || empty($_POST['telefono']) ||
-      empty($_POST['modelo']) || empty($_POST['n_serie']) ||
-      empty($_POST['marca']) || empty($_POST['tipo']) ||
-      empty($_POST['detalle']) || empty($_POST['costo']) || empty($_POST['usuario'])
-    ) {
+    if (!$this->existPOST([
+      'iddoc', 'nombres', 'modelo', 'marca', 'detalle', 'seriedoc', 'telefono', 'n_serie', 'tipo', 'costo', 'usuario', 'servicio'
+    ])) {
       $this->response(["error" => "Faltan parametros"]);
     }
 
@@ -160,12 +158,24 @@ class Reparacion extends Session
     }
     $idequipo = $ide ?? $equipo['id'];
 
-    if ($this->model->save([
+    if ($newId = $this->model->save([
       "idequipo" => $idequipo,
-      "detalle" => $_POST['detalle'],
-      "costo" => $_POST['costo'],
-      "idusuario" => $_POST['usuario'],
+      "detalle" => $this->getPost('detalle'),
+      "costo" => $this->getPost('costo'),
+      "idusuario" => $this->getPost('usuario'),
+      'idservicio' => $this->getPost('servicio'),
     ])) {
+      require_once 'models/detallesModel.php';
+
+      $detalle = new DetallesModel();
+      $detalle->id = $newId;
+      $detalle->tipo = 'reparacion';
+      $detalle->iditem = $this->getPost('servicio');
+      $detalle->tipo_item = 'servicio';
+      $detalle->precio = $this->getPost('costo');
+      $detalle->cantidad = 1;
+      $detalle->save();
+
       $this->response(["success" => "Reparación registrada"]);
     } else {
       $this->response(["error" => "Error al registrar repación"]);
