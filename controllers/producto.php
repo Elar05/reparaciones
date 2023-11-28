@@ -166,4 +166,25 @@ class Producto extends Session
 
     $this->response(["error" => "Error al actualizar estado"]);
   }
+
+  public function listProductosLocal()
+  {
+    $data = [];
+    $this->model->destino = 2;
+    $productos = $this->model->getAll();
+    if (count($productos) > 0) {
+      foreach ($productos as $producto) {
+        $modeloSerie = "$producto[modelo] - $producto[n_serie]";
+        $botones = "<button class='btn btn-success btn-sm producto' data-id='{$producto['id']}' data-modeloserie='$modeloSerie' data-precio='{$producto['precio_v']}' data-stock='{$producto['stock']}'><i class='fas fa-arrow-right'></i></button>";
+
+        $data[] = [
+          $modeloSerie,
+          $producto["precio_v"],
+          $producto["stock"],
+          $botones,
+        ];
+      }
+    }
+    $this->response(["data" => $data]);
+  }
 }

@@ -24,14 +24,21 @@ class ProductoModel extends Model
   public function getAll()
   {
     try {
+      $where = "";
+      if ($this->destino !== null) {
+        $where = "WHERE p.destino = '{$this->destino}'";
+      }
       $query = $this->query(
         "SELECT
           p.*,
           m.nombre AS modelo,
-          u.nombre AS unidad
+          m.idtipo AS tipo,
+          m.idmarca AS marca,
+          u.codigo AS unidad
         FROM productos p
           INNER JOIN modelos m ON p.idmodelo = m.id
-          INNER JOIN unidades u ON p.idunidad = u.id;"
+          INNER JOIN unidades u ON p.idunidad = u.id
+        $where;"
       );
       $query->execute();
       return $query->fetchAll(PDO::FETCH_ASSOC);
@@ -116,6 +123,19 @@ class ProductoModel extends Model
       return $query->execute();
     } catch (PDOException $e) {
       error_log("ProductoModel::updateStatus() -> " . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function updateStock()
+  {
+    try {
+      $query = $this->prepare("UPDATE productos SET stock = :stock WHERE id = :id;");
+      $query->bindParam(':stock', $this->stock, PDO::PARAM_STR);
+      $query->bindParam(':id', $this->id, PDO::PARAM_INT);
+      return $query->execute();
+    } catch (PDOException $e) {
+      error_log("ProductoModel::updateStock() -> " . $e->getMessage());
       return false;
     }
   }

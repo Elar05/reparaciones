@@ -21,8 +21,23 @@ function loadTable(data = {}) {
     ordering: false,
   });
 }
+function reLoadTable() {
+  $("#table_reparacion").DataTable().ajax.reload(null, false);
+}
+
+function loadTableProductos() {
+  $("#table_producto").DataTable({
+    destroy: true,
+    ajax: {
+      type: "post",
+      url: "producto/listProductosLocal",
+    },
+  });
+}
+
 $(document).ready(function () {
   loadTable();
+  loadTableProductos();
 
   $("#fechas").daterangepicker({
     locale: {
@@ -198,7 +213,7 @@ $("#form_reparacion").submit(function (e) {
             position: "topCenter",
             displayMode: 1,
           });
-          loadTable();
+          reLoadTable();
           $("#card_reparacion").removeClass("show");
         } else {
           iziToast.error({
@@ -332,7 +347,7 @@ $(document).on("click", "button.estado", function () {
           position: "topCenter",
           displayMode: 1,
         });
-        loadTable();
+        reLoadTable();
       } else {
         iziToast.error({
           title: "Error, ",
@@ -403,10 +418,200 @@ $("#servicio").change(function () {
   $("#costo").val($("option:selected", this).attr("precio"));
 });
 
-// Agregar detalle a la reparacion
+// Abrir modal para detalle de reparacion
 $(document).on("click", "button.terminar", function () {
-  let id = $(this).attr("id"),
-    estado = $(this).attr("estado");
+  let id = $(this).attr("id");
 
   $("#modal_detalle").modal("toggle");
+  $("#id").val(id);
+  $("#tbody_detalle").empty();
+
+  $.post(
+    "reparacion/getDetalleServicio",
+    { id },
+    function (data, textStatus, jqXHR) {
+      if ("servicios" in data) {
+        $("#doc_cliente").val(data.servicios.seriedoc);
+        $("#cliente").val(data.servicios.cliente);
+        $("#doc_cliente_hide").val(data.servicios.seriedoc);
+        $("#cliente_hide").val(data.servicios.cliente);
+        // Agregar servicio de la reparacion
+        $("#tbody_detalle").append(`
+          <tr data-idproducto='${data.servicios.iditem}'>
+            <td>${data.servicios.nombre}</td>
+            <td><input type=number min=1 value='${data.servicios.precio}' class='form-control form-control-sm precio' readonly></td>      
+            <td><input type=number min=1 value='${data.servicios.cantidad}' max=1 class='form-control form-control-sm cantidad' readonly></td>
+            <td><input type=number min=1 value='${data.servicios.subtotal}' class='form-control form-control-sm subtotal' readonly></td>
+            <td></td>
+          </tr>
+        `);
+        calcTotal();
+      }
+    },
+    "json"
+  );
+});
+// Cambiar boleta a factura
+$("#comrpobante").change(function (e) {
+  e.preventDefault();
+  if ($(this).val() === "B") {
+    $("#doc_cliente").val($("#doc_cliente_hide").val());
+    $("#cliente").val($("#cliente_hide").val());
+  } else {
+    $("#doc_cliente").val("");
+    $("#cliente").val("");
+  }
+});
+
+// Agregar detalle
+$(document).on("click", "button.producto", function () {
+  let id = $(this).data("id");
+  let precio = $(this).data("precio");
+  let stock = $(this).data("stock");
+  let modeloSerie = $(this).data("modeloserie");
+
+  // Buscar si ya existe una fila con el mismo ID
+  let existingRow = $("#tbody_detalle").find(`tr[data-idproducto='${id}']`);
+
+  if (existingRow.length > 0) {
+    // Si ya existe, aumentar la cantidad y recalcular el subtotal
+    let cantidadInput = existingRow.find(".cantidad");
+    let cantidad = parseInt(cantidadInput.val()) + 1;
+
+    if (cantidad <= stock) {
+      cantidadInput.val(cantidad);
+
+      let precioInput = existingRow.find(".precio");
+      let precio = parseInt(precioInput.val());
+
+      let subtotalInput = existingRow.find(".subtotal");
+      let subtotal = cantidad * precio;
+      subtotalInput.val(subtotal);
+    } else {
+      iziToast.warning({
+        title: "La cantidad excede el stock disponible",
+        message: "",
+        position: "topCenter",
+        displayMode: 1,
+      });
+    }
+  } else {
+    $("#tbody_detalle").append(`
+      <tr data-idproducto='${id}'>
+        <td>${modeloSerie}</td>
+        <td><input type=number min=${precio} value='${precio}' class='form-control form-control-sm precio'></td>      
+        <td><input type=number min=1 value=1 max=${stock} class='form-control form-control-sm cantidad'></td>
+        <td><input type=number min=${precio} value='${precio}' class='form-control form-control-sm subtotal' readonly></td>
+        <td><button class='btn btn-sm btn-danger delete_producto'><i class='fas fa-times'></td>
+      </tr>
+    `);
+  }
+
+  calcTotal();
+});
+
+// Calcular el subtotal al cambiar el precio
+$(document).on("input", ".precio", function () {
+  let precio = parseInt($(this).val());
+  let cantidad = parseInt($(this).closest("tr").find(".cantidad").val());
+  let subtotal = precio * cantidad;
+
+  // Actualizar el valor del subtotal
+  $(this).closest("tr").find(".subtotal").val(subtotal);
+
+  calcTotal();
+});
+
+// Calcular el subtotal al cambiar la cantidad
+$(document).on("input", ".cantidad", function () {
+  let stock = $(this).attr("max");
+  let cantidad = parseInt($(this).val());
+  if (cantidad <= stock) {
+    let precio = parseInt($(this).closest("tr").find(".precio").val());
+    let subtotal = cantidad * precio;
+
+    // Actualizar el valor del subtotal
+    $(this).closest("tr").find(".subtotal").val(subtotal);
+  } else {
+    iziToast.warning({
+      title: "La cantidad excede el stock disponible",
+      message: "",
+      position: "topCenter",
+      displayMode: 1,
+    });
+    $(this).val(stock);
+  }
+  calcTotal();
+});
+
+// Calcular el subtotal al eliminar un proudcto del resumen
+$(document).on("click", ".delete_producto", function () {
+  // Actualizar el valor del subtotal
+  $(this).closest("tr").remove();
+  calcTotal();
+});
+
+// Función para calcular y actualizar el total
+function calcTotal() {
+  let detalle = { id: $("#id").val(), productos: [], total: 0 };
+
+  // Iterar sobre todas las filas de la tabla
+  $("#tbody_detalle tr").each(function () {
+    let idproducto = $(this).data("idproducto");
+    let cantidad = parseInt($(this).find(".cantidad").val());
+    let precio = parseFloat($(this).find(".precio").val()) || 0;
+    let subtotal = cantidad * precio;
+    $(this).find(".subtotal").val(subtotal);
+
+    // Agregar el producto al array de productos en el detalle
+    detalle.productos.push({ idproducto, cantidad, precio, subtotal });
+
+    // Sumar el subtotal al total
+    detalle.total += subtotal;
+  });
+
+  // Actualizar el valor del total
+  let igv = detalle.total * 0.18;
+  let subtotal = detalle.total - igv;
+
+  $("#total").val(detalle.total.toFixed(2));
+  $("#igv").val(igv.toFixed(2));
+  $("#subtotal").val(subtotal.toFixed(2));
+  $("#detalle_reparacion").val(JSON.stringify(detalle));
+}
+
+$("#terminar").click(function (e) {
+  e.preventDefault();
+  calcTotal();
+  const detalle = JSON.parse($("#detalle_reparacion").val());
+  $.post(
+    "reparacion/terminar",
+    {
+      data: detalle,
+      comprobante: $("#comrpobante").val(),
+      descripcion: $("#descripcion").val(),
+    },
+    function (data, textStatus, jqXHR) {
+      if ("success" in data) {
+        iziToast.success({
+          title: "Éxito, ",
+          message: data.success,
+          position: "topCenter",
+          displayMode: 1,
+        });
+        $("#modal_detalle").modal("toggle");
+        $("#tbody_detalle").empty();
+        loadTableProductos();
+        reLoadTable();
+      } else {
+        iziToast.error({
+          title: "Error, ",
+          message: data.error,
+          position: "topCenter",
+          displayMode: 1,
+        });
+      }
+    },
+    "json"
+  );
 });

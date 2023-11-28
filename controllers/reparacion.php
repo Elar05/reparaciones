@@ -55,33 +55,43 @@ class Reparacion extends Session
     $reparaciones = $dataReparaciones['reparaciones'];
     if (count($reparaciones) > 0) {
       foreach ($reparaciones as $reparacion) {
-        $botones = "<div class='btn-group dropleft'>
-          <button type='button' class='btn btn-success dropdown-toggle' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>
-            <i class='fas fa-cog'></i>
-          </button>
-          <div class='dropdown-menu dropleft'>
-            <button class='dropdown-item edit' id='{$reparacion["id"]}'><i class='fas fa-pencil-alt text-warning'></i> Editar</button>
-            <button class='dropdown-item delete' id='{$reparacion["id"]}'><i class='fas fa-times text-danger'></i> Eliminar</button>
-          </div>
-        </div>";
+        $botones = "";
+        if ($reparacion['estado'] < 2) {
+          $botones = "<button class='btn btn-warning edit' id='{$reparacion["id"]}'><i class='fas fa-pencil-alt'></i></button>";
+        }
 
         $arrEstado = [
-          "0" => ["class" => "info", "text" => "En espera"],
-          "1" => ["class" => "warning", "text" => "En proceso"],
-          "2" => ["class" => "success", "text" => "Terminado"],
+          "0" => [
+            "class" => "info", "text" => "En espera",
+            "acciones" => "
+              <button class='dropdown-item estado' id='{$reparacion["id"]}' estado='1'><i class='fas fa-spinner text-warning'></i> En proceso</button>
+              <button class='dropdown-item estado' id='{$reparacion["id"]}' estado='3'><i class='fas fa-times text-danger'></i> Cancelar</button>
+            "
+          ],
+          "1" => [
+            "class" => "warning", "text" => "En proceso",
+            "acciones" => "
+              <button class='dropdown-item terminar' id='{$reparacion["id"]}'><i class='fas fa-check text-success'></i> Terminado</button>
+              <button class='dropdown-item estado' id='{$reparacion["id"]}' estado='3'><i class='fas fa-times text-danger'></i> Cancelar</button>
+            "
+          ],
+          "2" => ["class" => "success", "text" => "Terminado", "acciones" => "<button class='dropdown-item informacion' id='{$reparacion["id"]}'><i class='fas fa-info text-info'></i> Información</button>"],
+          "3" => ["class" => "danger", "text" => "Cancelado", "acciones" => ""],
         ];
         $estado = $reparacion["estado"];
         $class = $arrEstado[$estado]["class"];
         $txt = $arrEstado[$estado]["text"];
+        $acciones = $arrEstado[$estado]["acciones"];
 
         $estado = "<div class='btn-group dropleft'>
           <button type='button' class='btn btn-$class dropdown-toggle font-14' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false'>$txt</button>
           <div class='dropdown-menu dropleft'>
-            <button class='dropdown-item estado' id='{$reparacion["id"]}' estado='0'><i class='fas fa-pause text-info'></i> En espera</button>
-            <button class='dropdown-item estado' id='{$reparacion["id"]}' estado='1'><i class='fas fa-spinner text-warning'></i> En proceso</button>
-            <button class='dropdown-item terminar' id='{$reparacion["id"]}' estado='2'><i class='fas fa-check text-success'></i> Terminado</button>
+            $acciones
           </div>
         </div>";
+
+        $fInicio = date("d / m / Y", strtotime($reparacion["f_inicio"]));
+        $fFin = $reparacion["f_fin"] ? date("d / m / Y", strtotime($reparacion["f_fin"])) : '';
 
         $data[] = [
           $reparacion["id"],
@@ -89,8 +99,8 @@ class Reparacion extends Session
           $reparacion["cliente"],
           $reparacion["modelo"] . " - " . $reparacion["n_serie"],
           $reparacion["costo"],
-          $reparacion["f_inicio"],
-          $reparacion["f_fin"],
+          $fInicio,
+          $fFin,
           $estado,
           $botones
         ];
@@ -260,5 +270,86 @@ class Reparacion extends Session
   {
     require_once 'models/equipoModel.php';
     return new EquipoModel();
+  }
+
+  public function getDetalleServicio()
+  {
+    if (!$this->existPOST(['id'])) {
+      $this->response(['error' => 'Faltan parametros']);
+    }
+
+    $reparacion = $this->model->get($this->getPost('id'));
+
+    require_once 'models/detallesModel.php';
+    $detalle = new DetallesModel();
+    $detalle->id = $reparacion['id'];
+    $detalle->iditem = $reparacion['idservicio'];
+
+    $servicios = $detalle->getDetalleServicio();
+    $servicios['cliente'] = $reparacion['nombres'];
+    $servicios['seriedoc'] = $reparacion['seriedoc'];
+
+    $this->response(['servicios' => $servicios]);
+  }
+
+  public function terminar()
+  {
+    if (!$this->existPOST(['data', 'comprobante'])) {
+      $this->response(['error' => 'Faltan parametros']);
+    }
+
+    $data = $this->getPost('data');
+
+    if (empty($data['id']) || empty($data['productos']) || empty($data['total'])) {
+      $this->response(['error' => 'Faltan parametros']);
+    }
+
+    $reparacion = $this->model->get($data['id']);
+
+    require_once 'models/detallesModel.php';
+    require_once 'models/productoModel.php';
+    require_once 'models/ventaModel.php';
+
+    $detalle = new DetallesModel();
+    $detalle->id = $reparacion['id'];
+    $detalle->tipo = 'reparacion';
+
+    $productoM = new ProductoModel();
+    foreach ($data['productos'] as $producto) {
+      if ($producto['idproducto'] != $reparacion['idservicio']) {
+        $detalle->tipo_item = 'producto';
+        $detalle->iditem = $producto['idproducto'];
+        $detalle->precio = $producto['precio'];
+        $detalle->cantidad = $producto['cantidad'];
+
+        if ($detalle->save()) {
+          $product = $productoM->get($producto['idproducto']);
+          $productoM->id = $product['id'];
+          $productoM->stock = $product['stock'] - $producto['cantidad'];
+          $productoM->updateStock();
+        }
+      }
+    }
+
+    $venta = new VentaModel();
+    $venta->idcliente = $reparacion['idcliente'];
+    $venta->idusuario = $this->userId;
+    $venta->comprobante = $this->getPost('comprobante');
+    $venta->serie = ($this->getPost('comprobante') == "B") ? "B001" : "F001";
+    $venta->descripcion = $this->getPost('descripcion');
+
+    $venta->total = $data['total'];
+    $venta->igv = $venta->total * 0.18;
+    $venta->subtotal = $venta->total - $venta->igv;
+    $venta->origen = "2"; # 1 => tienda / 2 => local
+    $venta->save();
+
+    $this->model->update([
+      'f_fin' => date('Y-m-d H:i:s'), 'estado' => 2,
+      'idventa' => $venta->id
+    ], $reparacion['id']);
+
+    $this->response(['success' => 'Reparacion terminada']);
+    // hacer var_dump de productos
   }
 }
