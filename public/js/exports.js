@@ -1,7 +1,9 @@
+export const URL_BASE = "http://localhost/php/reparaciones"
+
 export function getCliente(data, callback) {
   $.ajax({
     type: "post",
-    url: "cliente/get",
+    url: `${URL_BASE}/cliente/get`,
     data,
     dataType: "json",
     success: function (response) {

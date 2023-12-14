@@ -1,5 +1,5 @@
 <div class="col-4 form-group">
-  <label for="iddoc">Tipo de Documento</label>
+  <label for="iddoc">Tipo de Doc</label>
   <select id="iddoc" name="iddoc" class="form-control input_cliente" required>
     <?php
     foreach ($this->d['documentos'] as $tipo) {

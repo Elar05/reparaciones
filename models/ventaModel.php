@@ -77,4 +77,25 @@ class VentaModel extends Model
       return false;
     }
   }
+
+  public function getAll($colum = null, $value = null)
+  {
+    try {
+      $sql = "";
+      if ($colum !== null and $value !== null) $sql = " WHERE $colum = '$value'";
+
+      $query = $this->query(
+        "SELECT v.*, c.nombres AS cliente, u.nombres AS usuario
+        FROM ventas v
+        INNER JOIN usuarios u ON v.idusuario = u.id
+        INNER JOIN clientes c ON v.idcliente = c.id
+        $sql;"
+      );
+      $query->execute();
+      return $query->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log("VentaModel::getAll() -> " . $e->getMessage());
+      return false;
+    }
+  }
 }

@@ -170,7 +170,7 @@ class Producto extends Session
   public function listProductosLocal()
   {
     $data = [];
-    $this->model->destino = 2;
+    $this->model->destino = $_POST['destino'] ?? 2;
     $productos = $this->model->getAll();
     if (count($productos) > 0) {
       foreach ($productos as $producto) {
