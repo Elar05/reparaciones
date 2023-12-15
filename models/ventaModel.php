@@ -21,12 +21,13 @@ class VentaModel extends Model
     parent::__construct();
   }
 
-  public function get($id, $column = "id")
+  public function get($id, $column = "v.id")
   {
     try {
       $query = $this->prepare(
-        "SELECT *
-        FROM ventas
+        "SELECT v.*, c.nombres, c.email, c.telefono, c.direccion
+        FROM ventas v
+        INNER JOIN clientes c ON v.idcliente = c.id
         WHERE $column = ?;"
       );
       $query->execute([$id]);

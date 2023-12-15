@@ -205,3 +205,68 @@ $("#form_venta").submit(function (e) {
 
   form.addClass("was-validated");
 });
+
+// Mostrar detalle de venta
+$(document).on("click", "button.detalle", function () {
+  $("#modal_detalle").modal("toggle");
+  $("#body_detalle").empty();
+  let id = $(this).attr("id");
+  $.post(
+    "venta/get",
+    { id },
+    function (data, textStatus, jqXHR) {
+      if ("venta" in data) {
+        let html = `
+          <h5>Información del Cliente</h5>
+          <p><strong>Nombres:</strong> ${data.venta.nombres}</p>
+          <p><strong>Dirección:</strong> ${data.venta.direccion}</p>
+          <p><strong>Email:</strong> ${data.venta.email}</p>
+          <p><strong>Télefono:</strong> ${data.venta.telefono}</p>
+        `;
+
+        let rows = "";
+        data.venta.detalle.forEach((producto) => {
+          rows += `
+            <tr>
+              <th>${producto.nombre}</th>
+              <th>${producto.precio}</th>
+              <th>${producto.cantidad}</th>
+              <th>${producto.subtotal}</th>
+            </tr>
+          `;
+        });
+
+        html += `
+          <table class="table table-striped w-100" id="table_venta">
+            <thead>
+              <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Subtotal</th>
+              </tr>
+              ${rows}
+              <tr>
+                <th></th>
+                <th></th>
+                <th>Total</th>
+                <th>${data.venta.total}</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        `;
+
+        $("#body_detalle").append(html);
+      } else {
+        iziToast.error({
+          title: "Error, ",
+          message: "Algo salio mal",
+          position: "topCenter",
+          displayMode: 1,
+        });
+      }
+    },
+    "json"
+  );
+});

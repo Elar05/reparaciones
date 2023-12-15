@@ -74,4 +74,26 @@ class Controller
     echo json_encode($data);
     exit();
   }
+
+  public function redirectEncode($url, $mensajes = [])
+  {
+    $data = [];
+    $params = '';
+
+    foreach ($mensajes as $key => $value) {
+      $data[] = $key . '=' . $this->encrypt($value);
+    }
+
+    $params = join('&', $data);
+
+    if ($params != '') $params = '?' . $params;
+
+    header('Location: ' . URL . "$url$params");
+    exit();
+  }
+
+  public function encrypt($value)
+  {
+    return base64_encode($value);
+  }
 }

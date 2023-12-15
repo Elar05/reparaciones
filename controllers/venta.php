@@ -117,4 +117,48 @@ class Venta extends Session
 
     $this->response(["data" => $data]);
   }
+
+  public function get()
+  {
+    if (!$this->existPOST(['id'])) {
+      $this->response(['error' => 'Faltan parametros']);
+    }
+
+    $venta = new VentaModel();
+    $venta = $venta->get($_POST['id']);
+
+    require_once 'models/detallesModel.php';
+    $detalle = new DetallesModel();
+    $detalle->id = $venta['id'];
+    $detalle->tipo = 'venta';
+
+    $productos = $detalle->getDetalleProductos();
+    $venta['detalle'] = $productos;
+
+    $this->response(['venta' => $venta]);
+  }
+
+  public function pdf()
+  {
+    if (!$this->existGET(['id'])) {
+      $this->redirectEncode("venta", ["message" => "Algo salio mal"]);
+    }
+
+    if (empty($_GET['id'])) {
+      $this->redirectEncode("venta", ["message" => "Algo salio mal"]);
+    }
+
+    $venta = new VentaModel();
+    $venta = $venta->get($_GET['id']);
+
+    require_once 'models/detallesModel.php';
+    $detalle = new DetallesModel();
+    $detalle->id = $venta['id'];
+    $detalle->tipo = 'venta';
+
+    $productos = $detalle->getDetalleProductos();
+    $venta['detalle'] = $productos;
+
+    $this->view->render('venta/pdf', ['venta' => $venta]);
+  }
 }

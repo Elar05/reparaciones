@@ -1,1 +1,5 @@
 public/img/productos/
+vendor
+debug.log
+composer.json
+composer.lock
