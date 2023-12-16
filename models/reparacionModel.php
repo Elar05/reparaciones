@@ -150,4 +150,84 @@ class ReparacionModel extends Model
       return false;
     }
   }
+
+  public function getIngresosByMonth($year)
+  {
+    try {
+      $query = $this->query("SELECT 
+        DATE_FORMAT(f_inicio, '%m') AS mes, 
+        SUM(costo) AS total_por_mes 
+        FROM reparaciones 
+        WHERE f_inicio LIKE '$year%' 
+        GROUP BY mes 
+        ORDER BY mes;
+      ");
+      $query->execute();
+      return $query->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log('ReparacionModel::getIngresosByMonth() -> ' . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function getIngresosByMonthAndUser($year)
+  {
+    try {
+      $query = $this->query("SELECT
+        DATE_FORMAT(r.f_inicio, '%m') AS mes,
+        r.idusuario, u.nombres,
+        SUM(r.costo) AS total_por_mes
+        FROM reparaciones r
+        JOIN usuarios u ON r.idusuario = u.id
+        WHERE f_inicio LIKE '$year%'
+        GROUP BY mes, idusuario
+        ORDER BY mes;
+      ");
+      $query->execute();
+      return $query->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log('ReparacionModel::getIngresosByMonthAndUser() -> ' . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function getRepairsByMonth($year)
+  {
+    try {
+      $query = $this->query("SELECT
+        DATE_FORMAT(f_inicio, '%m') AS mes,
+        COUNT(*) AS total
+        FROM reparaciones
+        WHERE f_inicio LIKE '$year%'
+        GROUP BY mes
+        ORDER BY mes;
+      ");
+      $query->execute();
+      return $query->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log('ReparacionModel::getRepairsByMonth() -> ' . $e->getMessage());
+      return false;
+    }
+  }
+
+  public function getRepairsByMonthAndUser($year)
+  {
+    try {
+      $query = $this->query("SELECT
+          DATE_FORMAT(r.f_inicio, '%m') AS mes,
+          r.idusuario, u.nombres,
+          COUNT(*) AS total
+        FROM reparaciones r
+        JOIN usuarios u ON r.idusuario = u.id
+        WHERE f_inicio LIKE '$year%'
+        GROUP BY mes, idusuario
+        ORDER BY mes;
+      ");
+      $query->execute();
+      return $query->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+      error_log('ReparacionModel::getRepairsByMonthAndUser() -> ' . $e->getMessage());
+      return false;
+    }
+  }
 }
